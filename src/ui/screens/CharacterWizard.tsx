@@ -3,28 +3,53 @@ import PixelCharacter from '@ui/components/PixelCharacter';
 import PixelButton from '@ui/components/PixelButton';
 import PixelIcon, { type IconName } from '@ui/components/PixelIcon';
 import PixelTitle from '@ui/components/PixelTitle';
+import IconButton from '@ui/components/IconButton';
 import {
-  BOTTOM_COLORS,
-  BOTTOM_OPTIONS,
-  CHARACTER_PRESETS,
-  HAIR_COLORS,
+  BOTTOM_TYPE_LABELS,
+  BOTTOM_TYPE_OPTIONS,
+  CLOTH_COLOR_OPTIONS,
+  CLOTH_COLORS,
+  EQUIPMENT_LABELS,
+  EQUIPMENT_OPTIONS,
+  getDefaultCharacter,
   HAIR_COLOR_OPTIONS,
+  HAIR_COLORS,
+  HAIR_LABELS,
   HAIR_OPTIONS,
+  SHOE_LABELS,
+  SHOE_OPTIONS,
   SKIN_COLORS,
   SKIN_OPTIONS,
-  TOP_COLORS,
-  TOP_OPTIONS,
-  type BottomId,
+  TOP_TYPE_LABELS,
+  TOP_TYPE_OPTIONS,
+  type BottomType,
   type CharacterConfig,
+  type ClothColor,
+  type EquipmentId,
   type HairColorId,
   type HairId,
+  type ShoeId,
   type SkinId,
-  type TopId,
+  type TopType,
 } from '@engine/avatar/character';
 import { LANGUAGE_LABELS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@i18n/init';
 
-type SlotStep = 'preset' | 'skin' | 'hair' | 'haircolor' | 'top' | 'bottom';
-type Step = SlotStep | 'details';
+type Category = 'skin' | 'hair' | 'top' | 'bottom' | 'shoe' | 'equipment' | 'details';
+
+interface CategoryDef {
+  id: Category;
+  label: string;
+  icon: IconName;
+}
+
+const CATEGORIES: CategoryDef[] = [
+  { id: 'skin', label: 'HAUTFARBE', icon: 'skin' },
+  { id: 'hair', label: 'FRISUR', icon: 'hair' },
+  { id: 'top', label: 'OBERTEIL', icon: 'shirt' },
+  { id: 'bottom', label: 'HOSE', icon: 'pants' },
+  { id: 'shoe', label: 'SCHUHE', icon: 'home' },
+  { id: 'equipment', label: 'AUSRÜSTUNG', icon: 'gear' },
+];
 
 interface CreatePayload {
   character: CharacterConfig;
@@ -48,40 +73,28 @@ interface EditProps {
 
 type Props = CreateProps | EditProps;
 
-const SLOT_STEPS: { id: SlotStep; title: string; icon: IconName }[] = [
-  { id: 'preset', title: 'WÄHLE EINEN STARTER', icon: 'play' },
-  { id: 'skin', title: 'HAUTFARBE', icon: 'skin' },
-  { id: 'hair', title: 'FRISUR', icon: 'hair' },
-  { id: 'haircolor', title: 'HAARFARBE', icon: 'paint' },
-  { id: 'top', title: 'OBERTEIL', icon: 'shirt' },
-  { id: 'bottom', title: 'HOSE', icon: 'pants' },
-];
-
-const HAIR_LABELS: Record<HairId, string> = {
-  short: 'KURZ', spiky: 'STACHEL', long: 'LANG', pony: 'ZOPF', bun: 'DUTT', curly: 'LOCKEN',
-};
-
 export default function CharacterWizard(props: Props) {
   const isEdit = props.mode === 'edit';
-  const initial = isEdit ? props.initialCharacter : CHARACTER_PRESETS[0].config;
+  const initial = isEdit ? props.initialCharacter : getDefaultCharacter();
   const [character, setCharacter] = useState<CharacterConfig>(initial);
 
-  // Step-Reihenfolge
-  const STEPS: Step[] = useMemo(
-    () => (isEdit ? ['skin', 'hair', 'haircolor', 'top', 'bottom'] : ['preset', 'skin', 'hair', 'haircolor', 'top', 'bottom', 'details']),
+  const STEPS = useMemo<Category[]>(
+    () => (isEdit ? CATEGORIES.map((c) => c.id) : [...CATEGORIES.map((c) => c.id), 'details']),
     [isEdit],
   );
   const [stepIdx, setStepIdx] = useState(0);
   const currentStep = STEPS[stepIdx];
 
-  // Details-State (nur create)
   const [name, setName] = useState('');
   const [age, setAge] = useState(6);
   const [language, setLanguage] = useState<SupportedLanguage>('de');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const stepLabel = currentStep === 'details' ? 'DEIN NAME' : SLOT_STEPS.find((s) => s.id === currentStep)!.title;
+  const stepLabel =
+    currentStep === 'details'
+      ? 'DEIN NAME'
+      : CATEGORIES.find((c) => c.id === currentStep)!.label;
   const isFirst = stepIdx === 0;
   const isLast = stepIdx === STEPS.length - 1;
   const canAdvance = currentStep === 'details' ? name.trim().length > 0 : true;
@@ -112,136 +125,183 @@ export default function CharacterWizard(props: Props) {
     else setStepIdx((i) => i - 1);
   };
 
-  const jumpTo = (step: Step) => {
-    const idx = STEPS.indexOf(step);
+  const jumpTo = (cat: Category) => {
+    const idx = STEPS.indexOf(cat);
     if (idx >= 0) setStepIdx(idx);
   };
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col bg-bg-deep">
       {/* Top-Bar */}
-      <header className="flex items-center justify-between px-6 py-4 border-b-4 border-ink bg-bg-mid">
-        <button
-          onClick={goBack}
-          disabled={submitting}
-          className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0"
-          aria-label="Zurück"
-        >
+      <header className="flex items-center justify-between px-6 py-4 border-b-4 border-ink bg-bg-mid/80">
+        <IconButton onClick={goBack} disabled={submitting}>
           <PixelIcon name="arrow-left" size={26} tone="white" />
-        </button>
+        </IconButton>
         <PixelTitle size="md">{stepLabel}</PixelTitle>
         <div className="font-pixel text-[12px] text-white/60 w-14 text-right">
           {stepIdx + 1}/{STEPS.length}
         </div>
       </header>
 
-      {/* Edit-Mode: Tab-Leiste zum direkten Springen */}
-      {isEdit && currentStep !== 'details' && (
-        <div className="flex justify-center gap-2 py-3 flex-wrap border-b-2 border-ink-soft bg-bg-mid/50">
-          {SLOT_STEPS.filter((s) => s.id !== 'preset').map((s) => (
-            <button
-              key={s.id}
-              onClick={() => jumpTo(s.id)}
-              className={`pixel-btn border-ink shadow-pixel-sm h-12 px-3 flex items-center gap-2
-                ${currentStep === s.id ? 'bg-primary-500 shadow-ink-soft' : 'bg-bg-card shadow-black hover:bg-bg-mid'}`}
-            >
-              <PixelIcon name={s.icon} size={20} />
-              <span className="font-pixel text-[10px] text-white">{s.title}</span>
-            </button>
-          ))}
-        </div>
-      )}
+      {/* 3-Spalten-Body (auf Mobile gestapelt) */}
+      <main className="flex-1 overflow-hidden flex flex-col lg:flex-row min-h-0">
+        {/* Kategorien-Sidebar (oben auf Mobile) */}
+        <aside className="lg:w-56 lg:border-r-4 border-b-4 lg:border-b-0 border-ink bg-bg-mid/40 overflow-x-auto lg:overflow-y-auto">
+          <ul className="flex lg:flex-col gap-2 p-3 min-w-max lg:min-w-0">
+            {STEPS.map((stepId, i) => {
+              const def = CATEGORIES.find((c) => c.id === stepId);
+              const label = stepId === 'details' ? 'NAME' : def?.label;
+              const icon: IconName = stepId === 'details' ? 'gear' : def?.icon ?? 'gear';
+              const active = stepIdx === i;
+              const passed = i < stepIdx;
+              return (
+                <li key={stepId}>
+                  <button
+                    onClick={() => jumpTo(stepId)}
+                    className={`pixel-btn border-ink shadow-pixel-sm h-12 px-3 flex items-center gap-2 w-full
+                      ${active
+                        ? 'bg-primary-500 shadow-ink-soft'
+                        : passed
+                          ? 'bg-emerald-700 shadow-emerald-900'
+                          : 'bg-bg-card shadow-black hover:bg-bg-mid'}`}
+                  >
+                    <PixelIcon name={passed ? 'check' : icon} size={18} tone="white" />
+                    <span className="font-pixel text-[10px] text-white whitespace-nowrap">{label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </aside>
 
-      {/* Content */}
-      <main className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-5xl mx-auto flex flex-col lg:flex-row gap-8 items-center">
-          {/* Live-Preview */}
-          {currentStep !== 'preset' && (
-            <div className="lg:sticky lg:top-4 shrink-0">
-              <div className="rounded-chunk p-4 bg-gradient-to-b from-indigo-700 to-indigo-900 shadow-pixel-md shadow-ink border-4 border-ink">
-                <PixelCharacter config={character} size={240} bg={null} />
-              </div>
-            </div>
-          )}
+        {/* Live-Preview Center */}
+        <section className="flex items-center justify-center p-6 lg:flex-1 lg:min-w-0 bg-bg-deep">
+          <div className="rounded-chunk p-4 bg-gradient-to-b from-indigo-700 to-indigo-900 shadow-pixel-md shadow-ink border-4 border-ink">
+            <PixelCharacter config={character} size={260} bg={null} />
+          </div>
+        </section>
 
-          {/* Optionen */}
-          <div className="flex-1 w-full">
-            {currentStep === 'preset' && <PresetGrid value={character.presetId} onChange={(c) => setCharacter(c)} />}
-            {currentStep === 'skin' && (
-              <OptionGrid
-                options={SKIN_OPTIONS.map((id) => ({
-                  id,
-                  label: SKIN_COLORS[id].label.toUpperCase(),
-                  preview: <PixelCharacter config={{ ...character, skinId: id }} size={120} bg={null} />,
-                }))}
+        {/* Optionen rechts (oder unten auf Mobile) */}
+        <section className="lg:w-[420px] lg:border-l-4 border-t-4 lg:border-t-0 border-ink bg-bg-mid/30 overflow-y-auto p-5">
+          {currentStep === 'skin' && (
+            <Section title="FARBE">
+              <SwatchGrid
+                options={SKIN_OPTIONS.map((id) => ({ id, label: SKIN_COLORS[id].label.toUpperCase(), color: SKIN_COLORS[id].fill }))}
                 value={character.skinId}
                 onChange={(id) => setCharacter({ ...character, skinId: id as SkinId })}
               />
-            )}
-            {currentStep === 'hair' && (
-              <OptionGrid
-                options={HAIR_OPTIONS.map((id) => ({
+            </Section>
+          )}
+
+          {currentStep === 'hair' && (
+            <>
+              <Section title="TYP">
+                <PreviewGrid
+                  options={HAIR_OPTIONS.map((id) => ({
+                    id,
+                    label: HAIR_LABELS[id].toUpperCase(),
+                    preview: <PixelCharacter config={{ ...character, hairId: id }} size={80} bg={null} />,
+                  }))}
+                  value={character.hairId}
+                  onChange={(id) => setCharacter({ ...character, hairId: id as HairId })}
+                />
+              </Section>
+              <Section title="FARBE">
+                <SwatchGrid
+                  options={HAIR_COLOR_OPTIONS.map((id) => ({ id, label: HAIR_COLORS[id].label.toUpperCase(), color: HAIR_COLORS[id].fill }))}
+                  value={character.hairColorId}
+                  onChange={(id) => setCharacter({ ...character, hairColorId: id as HairColorId })}
+                />
+              </Section>
+            </>
+          )}
+
+          {currentStep === 'top' && (
+            <>
+              <Section title="TYP">
+                <PreviewGrid
+                  options={TOP_TYPE_OPTIONS.map((id) => ({
+                    id,
+                    label: TOP_TYPE_LABELS[id].toUpperCase(),
+                    preview: <PixelCharacter config={{ ...character, topTypeId: id }} size={80} bg={null} />,
+                  }))}
+                  value={character.topTypeId}
+                  onChange={(id) => setCharacter({ ...character, topTypeId: id as TopType })}
+                />
+              </Section>
+              <Section title="FARBE">
+                <SwatchGrid
+                  options={CLOTH_COLOR_OPTIONS.map((id) => ({ id, label: CLOTH_COLORS[id].label.toUpperCase(), color: CLOTH_COLORS[id].fill }))}
+                  value={character.topColorId}
+                  onChange={(id) => setCharacter({ ...character, topColorId: id as ClothColor })}
+                />
+              </Section>
+            </>
+          )}
+
+          {currentStep === 'bottom' && (
+            <>
+              <Section title="TYP">
+                <PreviewGrid
+                  options={BOTTOM_TYPE_OPTIONS.map((id) => ({
+                    id,
+                    label: BOTTOM_TYPE_LABELS[id].toUpperCase(),
+                    preview: <PixelCharacter config={{ ...character, bottomTypeId: id }} size={80} bg={null} />,
+                  }))}
+                  value={character.bottomTypeId}
+                  onChange={(id) => setCharacter({ ...character, bottomTypeId: id as BottomType })}
+                />
+              </Section>
+              <Section title="FARBE">
+                <SwatchGrid
+                  options={CLOTH_COLOR_OPTIONS.map((id) => ({ id, label: CLOTH_COLORS[id].label.toUpperCase(), color: CLOTH_COLORS[id].fill }))}
+                  value={character.bottomColorId}
+                  onChange={(id) => setCharacter({ ...character, bottomColorId: id as ClothColor })}
+                />
+              </Section>
+            </>
+          )}
+
+          {currentStep === 'shoe' && (
+            <Section title="TYP">
+              <PreviewGrid
+                options={SHOE_OPTIONS.map((id) => ({
                   id,
-                  label: HAIR_LABELS[id],
-                  preview: <PixelCharacter config={{ ...character, hairId: id }} size={120} bg={null} />,
+                  label: SHOE_LABELS[id].toUpperCase(),
+                  preview: <PixelCharacter config={{ ...character, shoeId: id }} size={80} bg={null} />,
                 }))}
-                value={character.hairId}
-                onChange={(id) => setCharacter({ ...character, hairId: id as HairId })}
+                value={character.shoeId}
+                onChange={(id) => setCharacter({ ...character, shoeId: id as ShoeId })}
               />
-            )}
-            {currentStep === 'haircolor' && (
-              <OptionGrid
-                options={HAIR_COLOR_OPTIONS.map((id) => ({
+            </Section>
+          )}
+
+          {currentStep === 'equipment' && (
+            <Section title="WAS DAGEGEN">
+              <PreviewGrid
+                options={EQUIPMENT_OPTIONS.map((id) => ({
                   id,
-                  label: HAIR_COLORS[id].label.toUpperCase(),
-                  preview: (
-                    <div
-                      className="w-[120px] h-[120px] rounded-chunk flex items-center justify-center border-4 border-ink"
-                      style={{ background: HAIR_COLORS[id].fill }}
-                    >
-                      <PixelCharacter config={{ ...character, hairColorId: id }} size={90} bg={null} />
-                    </div>
-                  ),
+                  label: EQUIPMENT_LABELS[id].toUpperCase(),
+                  preview: <PixelCharacter config={{ ...character, equipmentId: id }} size={80} bg={null} />,
                 }))}
-                value={character.hairColorId}
-                onChange={(id) => setCharacter({ ...character, hairColorId: id as HairColorId })}
+                value={character.equipmentId}
+                onChange={(id) => setCharacter({ ...character, equipmentId: id as EquipmentId })}
               />
-            )}
-            {currentStep === 'top' && (
-              <OptionGrid
-                options={TOP_OPTIONS.map((id) => ({
-                  id,
-                  label: TOP_COLORS[id].label.toUpperCase(),
-                  preview: <PixelCharacter config={{ ...character, topId: id }} size={120} bg={null} />,
-                }))}
-                value={character.topId}
-                onChange={(id) => setCharacter({ ...character, topId: id as TopId })}
-              />
-            )}
-            {currentStep === 'bottom' && (
-              <OptionGrid
-                options={BOTTOM_OPTIONS.map((id) => ({
-                  id,
-                  label: BOTTOM_COLORS[id].label.toUpperCase(),
-                  preview: <PixelCharacter config={{ ...character, bottomId: id }} size={120} bg={null} />,
-                }))}
-                value={character.bottomId}
-                onChange={(id) => setCharacter({ ...character, bottomId: id as BottomId })}
-              />
-            )}
-            {currentStep === 'details' && (
-              <DetailsForm
-                name={name}
-                age={age}
-                language={language}
-                onName={setName}
-                onAge={setAge}
-                onLanguage={setLanguage}
-                error={error}
-              />
-            )}
-          </div>
-        </div>
+            </Section>
+          )}
+
+          {currentStep === 'details' && (
+            <DetailsForm
+              name={name}
+              age={age}
+              language={language}
+              onName={setName}
+              onAge={setAge}
+              onLanguage={setLanguage}
+              error={error}
+            />
+          )}
+        </section>
       </main>
 
       {/* Bottom-CTA */}
@@ -262,7 +322,9 @@ export default function CharacterWizard(props: Props) {
           size="lg"
           onClick={advance}
           disabled={!canAdvance || submitting}
-          iconRight={isLast ? <PixelIcon name="check" size={22} tone="white" /> : <PixelIcon name="arrow-right" size={22} tone="white" />}
+          iconRight={
+            isLast ? <PixelIcon name="check" size={22} tone="white" /> : <PixelIcon name="arrow-right" size={22} tone="white" />
+          }
         >
           {isLast ? (isEdit ? 'SPEICHERN' : 'SPIELEN') : 'WEITER'}
         </PixelButton>
@@ -271,42 +333,52 @@ export default function CharacterWizard(props: Props) {
   );
 }
 
-function PresetGrid({ value, onChange }: { value: string; onChange: (c: CharacterConfig) => void }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-      {CHARACTER_PRESETS.map((preset) => (
+    <div className="mb-6">
+      <h3 className="font-pixel text-[11px] text-white/60 mb-3">{title}</h3>
+      {children}
+    </div>
+  );
+}
+
+interface PreviewItem { id: string; label: string; preview: React.ReactNode }
+
+function PreviewGrid({ options, value, onChange }: { options: PreviewItem[]; value: string; onChange: (id: string) => void }) {
+  return (
+    <div className="grid grid-cols-3 gap-2">
+      {options.map((opt) => (
         <button
-          key={preset.id}
-          onClick={() => onChange(preset.config)}
-          className={`pixel-btn border-ink shadow-pixel-md p-4 flex flex-col items-center gap-2 h-auto
-            ${value === preset.id ? 'bg-primary-500 shadow-ink-soft' : 'bg-bg-card shadow-black hover:bg-bg-mid'}`}
+          key={opt.id}
+          onClick={() => onChange(opt.id)}
+          className={`pixel-btn border-ink shadow-pixel-sm p-2 flex flex-col items-center gap-1 h-auto
+            ${value === opt.id ? 'bg-primary-500 shadow-ink-soft' : 'bg-bg-card shadow-black hover:bg-bg-mid'}`}
         >
-          <PixelCharacter config={preset.config} size={140} bg={null} />
-          <span className="font-pixel text-[14px] text-white">{preset.label.toUpperCase()}</span>
+          {opt.preview}
+          <span className="font-pixel text-[9px] text-white whitespace-nowrap">{opt.label}</span>
         </button>
       ))}
     </div>
   );
 }
 
-interface OptionItem {
-  id: string;
-  label: string;
-  preview: React.ReactNode;
-}
+interface SwatchItem { id: string; label: string; color: string }
 
-function OptionGrid({ options, value, onChange }: { options: OptionItem[]; value: string; onChange: (id: string) => void }) {
+function SwatchGrid({ options, value, onChange }: { options: SwatchItem[]; value: string; onChange: (id: string) => void }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
       {options.map((opt) => (
         <button
           key={opt.id}
           onClick={() => onChange(opt.id)}
-          className={`pixel-btn border-ink shadow-pixel-md p-3 flex flex-col items-center gap-2 h-auto
+          className={`pixel-btn border-ink shadow-pixel-sm p-2 flex flex-col items-center gap-1 h-auto
             ${value === opt.id ? 'bg-primary-500 shadow-ink-soft' : 'bg-bg-card shadow-black hover:bg-bg-mid'}`}
         >
-          {opt.preview}
-          <span className="font-pixel text-[12px] text-white">{opt.label}</span>
+          <div
+            className="w-14 h-14 border-2 border-ink"
+            style={{ background: opt.color }}
+          />
+          <span className="font-pixel text-[9px] text-white">{opt.label}</span>
         </button>
       ))}
     </div>
@@ -331,35 +403,35 @@ function DetailsForm({
   error: string | null;
 }) {
   return (
-    <div className="max-w-xl mx-auto w-full space-y-4">
+    <div className="space-y-4">
       <label className="block">
-        <span className="font-pixel text-[12px] text-white/70 uppercase">Name</span>
+        <span className="font-pixel text-[11px] text-white/60 uppercase">Name</span>
         <input
           value={name}
           onChange={(e) => onName(e.target.value)}
           autoFocus
           placeholder="Dein Name"
-          className="mt-2 w-full bg-bg-card border-4 border-ink-soft rounded-chunk p-4 text-white text-3xl font-body font-bold"
+          className="mt-2 w-full bg-bg-card border-4 border-ink-soft rounded-chunk p-3 text-white text-2xl font-body font-bold"
           maxLength={20}
         />
       </label>
       <label className="block">
-        <span className="font-pixel text-[12px] text-white/70 uppercase">Alter</span>
+        <span className="font-pixel text-[11px] text-white/60 uppercase">Alter</span>
         <input
           type="number"
           value={age}
           min={4}
           max={14}
           onChange={(e) => onAge(parseInt(e.target.value) || 6)}
-          className="mt-2 w-full bg-bg-card border-4 border-ink-soft rounded-chunk p-4 text-white text-3xl font-body font-bold"
+          className="mt-2 w-full bg-bg-card border-4 border-ink-soft rounded-chunk p-3 text-white text-2xl font-body font-bold"
         />
       </label>
       <label className="block">
-        <span className="font-pixel text-[12px] text-white/70 uppercase">Sprache</span>
+        <span className="font-pixel text-[11px] text-white/60 uppercase">Sprache</span>
         <select
           value={language}
           onChange={(e) => onLanguage(e.target.value as SupportedLanguage)}
-          className="mt-2 w-full bg-bg-card border-4 border-ink-soft rounded-chunk p-4 text-white text-3xl font-body font-bold"
+          className="mt-2 w-full bg-bg-card border-4 border-ink-soft rounded-chunk p-3 text-white text-2xl font-body font-bold"
         >
           {SUPPORTED_LANGUAGES.map((l) => (
             <option key={l} value={l}>{LANGUAGE_LABELS[l]}</option>

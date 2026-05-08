@@ -1,6 +1,6 @@
 import Dexie, { type Table } from 'dexie';
 import type { SupportedLanguage } from '@i18n/init';
-import type { CharacterConfig } from '@engine/avatar/character';
+import { normalizeCharacter, type CharacterConfig } from '@engine/avatar/character';
 
 export interface Profile {
   id: string;
@@ -127,6 +127,21 @@ export class LernappDB extends Dexie {
       sessions: '++id, profileId, startedAt',
       audioCache: 'id, profileId, kind',
     });
+    // v5: Outfit-Schema gesplittet (TopType+Color, BottomType+Color) + Schuhe + Ausrüstung
+    this.version(5)
+      .stores({
+        profiles: 'id, name, createdAt',
+        progress: '++id, [profileId+subject+worldId+levelId], profileId, lastPlayedAt',
+        srs: '++id, [profileId+subject+taskKey], profileId, nextDue',
+        settings: 'id',
+        sessions: '++id, profileId, startedAt',
+        audioCache: 'id, profileId, kind',
+      })
+      .upgrade(async (tx) => {
+        await tx.table('profiles').toCollection().modify((p: Record<string, unknown>) => {
+          p.character = normalizeCharacter(p.character);
+        });
+      });
   }
 }
 
