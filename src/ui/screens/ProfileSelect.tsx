@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@engine/state/store';
 import AvatarSprite from '@ui/components/AvatarSprite';
 import PixelCharacter from '@ui/components/PixelCharacter';
+import PixelButton from '@ui/components/PixelButton';
+import PixelIcon from '@ui/components/PixelIcon';
+import PixelTitle from '@ui/components/PixelTitle';
 import { CHARACTER_PRESETS, type CharacterConfig } from '@engine/avatar/character';
 import { LANGUAGE_LABELS, SUPPORTED_LANGUAGES, type SupportedLanguage } from '@i18n/init';
 import PinPad from '@ui/components/PinPad';
@@ -27,7 +30,7 @@ export default function ProfileSelect({ onParentZone }: Props) {
 
   return (
     <div className="w-full h-full flex flex-col items-center p-6 overflow-y-auto">
-      <h1 className="text-5xl font-display mt-4 mb-8 text-center">{t('profile.select_title')}</h1>
+      <PixelTitle size="xl" className="mt-4 mb-10 text-center">{t('profile.select_title')}</PixelTitle>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 max-w-5xl w-full">
         {profiles.map((p) => (
@@ -37,29 +40,28 @@ export default function ProfileSelect({ onParentZone }: Props) {
               if (p.pin) setPinFor(p.id);
               else selectProfile(p.id);
             }}
-            className="card-tile bg-white/5 hover:bg-white/10 p-4 flex flex-col items-center gap-3 btn-pop"
+            className="pixel-btn bg-bg-card hover:bg-bg-mid border-ink-soft shadow-black shadow-pixel-md p-4 flex flex-col items-center gap-3 h-auto"
           >
-            <AvatarSprite config={p.character} size={140} />
-            <div className="text-2xl font-display">{p.name}</div>
-            <div className="text-sm text-white/60">{p.age} J · {LANGUAGE_LABELS[p.language]}</div>
+            <AvatarSprite config={p.character} size={150} />
+            <div className="text-2xl font-display font-bold text-white">{p.name}</div>
+            <div className="text-sm font-body text-white/70">{p.age} J · {LANGUAGE_LABELS[p.language]}</div>
           </button>
         ))}
 
         <button
           onClick={() => setShowCreate(true)}
-          className="card-tile bg-primary-500/20 hover:bg-primary-500/30 p-4 flex flex-col items-center gap-3 btn-pop border-dashed"
+          className="pixel-btn bg-primary-500/20 hover:bg-primary-500/40 border-primary-700 shadow-ink-soft shadow-pixel-md p-4 flex flex-col items-center gap-3 h-auto"
         >
-          <div className="w-[140px] h-[140px] rounded-3xl border-4 border-dashed border-white/30 flex items-center justify-center text-7xl">+</div>
-          <div className="text-2xl font-display">{t('profile.create_new')}</div>
+          <div className="w-[150px] h-[150px] rounded-chunk border-4 border-dashed border-white/30 flex items-center justify-center">
+            <PixelIcon name="plus" size={64} tone="white" />
+          </div>
+          <div className="text-2xl font-display font-bold text-white">{t('profile.create_new')}</div>
         </button>
       </div>
 
-      <button
-        onClick={onParentZone}
-        className="mt-10 px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white/80 font-display btn-pop"
-      >
-        🔒 {t('profile.parent_zone')}
-      </button>
+      <PixelButton variant="ghost" size="md" className="mt-10" onClick={onParentZone} iconLeft={<PixelIcon name="lock" size={20} />}>
+        {t('profile.parent_zone')}
+      </PixelButton>
 
       {showCreate && <CreateProfileFlow onClose={() => setShowCreate(false)} />}
 
@@ -113,12 +115,12 @@ function CreateProfileFlow({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="card-tile bg-slate-800 p-6 max-w-3xl w-full my-auto">
+    <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-bg-card border-4 border-ink shadow-pixel-lg shadow-ink rounded-chunk p-8 max-w-3xl w-full my-auto">
         {step === 'pick' && (
           <>
-            <h2 className="text-3xl font-display mb-2 text-center">Wähle deinen Charakter</h2>
-            <p className="text-center text-white/60 mb-6">Du kannst ihn später noch ändern</p>
+            <PixelTitle size="md" className="mb-2 text-center">Wähle deinen Charakter</PixelTitle>
+            <p className="text-center font-body font-bold text-white/70 mb-6">Du kannst ihn später noch ändern</p>
 
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mb-6">
               {CHARACTER_PRESETS.map((preset) => {
@@ -127,85 +129,84 @@ function CreateProfileFlow({ onClose }: { onClose: () => void }) {
                   <button
                     key={preset.id}
                     onClick={() => setCharacter(preset.config)}
-                    className={`card-tile p-2 flex flex-col items-center gap-1 btn-pop ${
-                      isActive ? 'bg-primary-500/40 ring-4 ring-primary-300' : 'bg-white/5 hover:bg-white/10'
-                    }`}
+                    className={`pixel-btn border-ink shadow-pixel-sm p-2 flex flex-col items-center gap-1 h-auto
+                      ${isActive ? 'bg-primary-500 shadow-ink-soft' : 'bg-bg-mid hover:bg-bg-deep shadow-black'}`}
                   >
                     <PixelCharacter config={preset.config} size={90} bg={null} />
-                    <div className="text-sm font-display">{preset.label}</div>
+                    <span className="font-pixel text-[10px] text-white">{preset.label.toUpperCase()}</span>
                   </button>
                 );
               })}
             </div>
 
             <div className="flex justify-end gap-3">
-              <button onClick={onClose} className="px-5 py-3 rounded-full bg-white/10 font-display btn-pop">Abbrechen</button>
-              <button
-                onClick={() => setStep('details')}
-                className="px-6 py-3 rounded-full bg-primary-500 font-display btn-pop"
-              >
-                Weiter →
-              </button>
+              <PixelButton variant="ghost" size="md" onClick={onClose}>Abbrechen</PixelButton>
+              <PixelButton variant="primary" size="md" onClick={() => setStep('details')} iconRight={<PixelIcon name="arrow-right" size={20} tone="white" />}>
+                Weiter
+              </PixelButton>
             </div>
           </>
         )}
 
         {step === 'details' && (
           <>
-            <h2 className="text-3xl font-display mb-4 text-center">Erzähl uns von dir</h2>
+            <PixelTitle size="md" className="mb-4 text-center">Erzähl uns von dir</PixelTitle>
 
             <div className="flex justify-center mb-6">
               <PixelCharacter config={character} size={140} />
             </div>
 
-            <label className="block mb-2 text-white/70">{t('profile.name')}</label>
+            <label className="block mb-2 font-body font-bold text-white/80 text-lg">{t('profile.name')}</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               autoFocus
               placeholder="Dein Name"
-              className="w-full bg-slate-700 rounded-xl p-3 mb-3 text-white text-xl"
+              className="w-full bg-bg-mid border-2 border-ink-soft rounded-chunk p-4 mb-4 text-white text-2xl font-body font-bold"
               maxLength={20}
             />
 
-            <label className="block mb-2 text-white/70">{t('profile.age')}</label>
+            <label className="block mb-2 font-body font-bold text-white/80 text-lg">{t('profile.age')}</label>
             <input
               type="number"
               value={age}
               min={4}
               max={14}
               onChange={(e) => setAge(parseInt(e.target.value) || 6)}
-              className="w-full bg-slate-700 rounded-xl p-3 mb-3 text-white text-xl"
+              className="w-full bg-bg-mid border-2 border-ink-soft rounded-chunk p-4 mb-4 text-white text-2xl font-body font-bold"
             />
 
-            <label className="block mb-2 text-white/70">{t('profile.language')}</label>
+            <label className="block mb-2 font-body font-bold text-white/80 text-lg">{t('profile.language')}</label>
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value as SupportedLanguage)}
-              className="w-full bg-slate-700 rounded-xl p-3 mb-4 text-white text-xl"
+              className="w-full bg-bg-mid border-2 border-ink-soft rounded-chunk p-4 mb-4 text-white text-2xl font-body font-bold"
             >
               {SUPPORTED_LANGUAGES.map((l) => (
                 <option key={l} value={l}>{LANGUAGE_LABELS[l]}</option>
               ))}
             </select>
 
-            {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
+            {error && <p className="text-accent-danger text-sm mb-3 font-body font-bold">{error}</p>}
 
             <div className="flex gap-3 justify-between">
-              <button
+              <PixelButton
+                variant="ghost"
+                size="md"
                 onClick={() => setStep('pick')}
                 disabled={submitting}
-                className="px-5 py-3 rounded-full bg-white/10 font-display btn-pop"
+                iconLeft={<PixelIcon name="arrow-left" size={20} tone="white" />}
               >
-                ← Zurück
-              </button>
-              <button
+                Zurück
+              </PixelButton>
+              <PixelButton
+                variant="success"
+                size="md"
                 onClick={handleSubmit}
                 disabled={!name.trim() || submitting}
-                className="px-6 py-3 rounded-full bg-primary-500 disabled:opacity-40 font-display btn-pop"
               >
                 {submitting ? '…' : t('profile.create')}
-              </button>
+              </PixelButton>
             </div>
           </>
         )}

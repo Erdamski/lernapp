@@ -6,6 +6,9 @@ import type { LevelDefinition, LevelResult, WorldDefinition } from '@subjects/ty
 import { audio } from '@engine/audio/AudioPlayer';
 import { recordLevelResult, getWorldProgress } from '@engine/progress/levels';
 import AvatarShop from './AvatarShop';
+import PixelButton from '@ui/components/PixelButton';
+import PixelIcon from '@ui/components/PixelIcon';
+import PixelTitle from '@ui/components/PixelTitle';
 import type { ProgressEntry } from '@engine/db/schema';
 
 type View = 'islands' | 'world' | 'level' | 'shop' | 'level-result';
@@ -41,16 +44,17 @@ export default function WorldMapScreen() {
     setView('level-result');
   };
 
-  // Insel-Karte
   if (view === 'islands') {
     return (
       <div className="w-full h-full flex flex-col p-6">
         <header className="flex items-center justify-between max-w-6xl mx-auto w-full mb-6">
-          <button onClick={logout} className="text-3xl btn-pop" aria-label="Profil wechseln">🔄</button>
-          <h1 className="text-4xl font-display">{t('world.map_title')}</h1>
-          <button onClick={() => setView('shop')} className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-400/20 hover:bg-amber-400/30 btn-pop">
-            <span className="text-2xl">🪙</span>
-            <span className="text-xl font-display">{profile.coins}</span>
+          <button onClick={logout} className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0" aria-label="Profil wechseln">
+            <PixelIcon name="swap" size={26} tone="white" />
+          </button>
+          <PixelTitle size="lg">{t('world.map_title')}</PixelTitle>
+          <button onClick={() => setView('shop')} className="pixel-btn bg-accent-coin border-ink shadow-amber-700 shadow-pixel-md px-4 h-14 flex items-center gap-2">
+            <PixelIcon name="coin" size={24} />
+            <span className="font-pixel text-[14px] text-ink">{profile.coins}</span>
           </button>
         </header>
 
@@ -63,41 +67,47 @@ export default function WorldMapScreen() {
                 setActiveWorld(s.worlds[0]);
                 setView('world');
               }}
-              className="card-tile bg-emerald-500/20 hover:bg-emerald-500/30 p-8 flex flex-col items-center gap-3 btn-pop w-64"
+              className="pixel-btn bg-emerald-500 hover:bg-emerald-400 border-ink shadow-emerald-900 shadow-pixel-md p-6 flex flex-col items-center gap-3 w-64 h-auto"
             >
-              <div className="text-8xl mb-2">{s.icon}</div>
-              <div className="text-3xl font-display">{t(s.labelKey)}</div>
+              <SubjectIcon id={s.id} />
+              <span className="font-pixel text-[18px] text-white">{t(s.labelKey)}</span>
             </button>
           ))}
-          {/* Teaser für künftige Fächer */}
-          <div className="card-tile bg-white/5 p-8 flex flex-col items-center gap-3 w-64 opacity-50">
-            <div className="text-8xl mb-2">🔒</div>
-            <div className="text-2xl font-display text-white/60">Bald verfügbar</div>
-            <div className="text-sm text-white/40">Deutsch · Englisch · …</div>
+
+          <div className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-md p-6 flex flex-col items-center gap-3 w-64 opacity-60 cursor-default">
+            <PixelIcon name="lock" size={64} />
+            <span className="font-pixel text-[14px] text-white/60">Bald verfügbar</span>
+            <span className="text-xs font-body text-white/40">Deutsch · Englisch</span>
           </div>
         </div>
 
         <footer className="flex justify-center gap-4 mt-6">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/20">
-            <span className="text-2xl">⭐</span>
-            <span className="text-xl font-display">{profile.totalStars}</span>
+          <div className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm h-12 px-4 flex items-center gap-2 cursor-default">
+            <PixelIcon name="star" size={22} />
+            <span className="font-pixel text-[14px]">{profile.totalStars}</span>
           </div>
-          <button onClick={() => setView('shop')} className="px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 font-display btn-pop">
-            👕 {t('avatar.title')}
-          </button>
+          <PixelButton variant="ghost" size="md" onClick={() => setView('shop')} iconLeft={<PixelIcon name="shirt" size={22} />}>
+            Ankleiden
+          </PixelButton>
         </footer>
       </div>
     );
   }
 
-  // Welt-Detail (Levels einer Welt)
   if (view === 'world' && activeWorld && activeSubjectId) {
     return (
       <div className="w-full h-full flex flex-col p-6">
         <header className="flex items-center justify-between max-w-6xl mx-auto w-full mb-6">
-          <button onClick={() => setView('islands')} className="text-3xl btn-pop">⬅️</button>
-          <h2 className="text-3xl font-display">{t(activeWorld.labelKey, `Klasse ${activeWorld.classLevel}`)}</h2>
-          <button onClick={() => audio.play(activeWorld.introAudioKey, { fallbackToTTS: true })} className="text-3xl btn-pop">🔊</button>
+          <button onClick={() => setView('islands')} className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0">
+            <PixelIcon name="arrow-left" size={26} tone="white" />
+          </button>
+          <PixelTitle size="md">{t(activeWorld.labelKey, `Klasse ${activeWorld.classLevel}`)}</PixelTitle>
+          <button
+            onClick={() => audio.play(activeWorld.introAudioKey, { fallbackToTTS: true })}
+            className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0"
+          >
+            <PixelIcon name="speaker" size={26} tone="white" />
+          </button>
         </header>
 
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto w-full content-start">
@@ -106,32 +116,33 @@ export default function WorldMapScreen() {
             const previous = idx > 0 ? activeWorld.levels[idx - 1] : null;
             const previousEntry = previous ? progress.find((p) => p.levelId === previous.id) : null;
             const isUnlocked = idx === 0 || (previousEntry?.stars ?? 0) >= 1;
+            const stars = entry?.stars ?? 0;
+
             return (
               <button
                 key={level.id}
                 onClick={() => isUnlocked && (setActiveLevel(level), setView('level'))}
                 disabled={!isUnlocked}
-                className={`card-tile p-6 flex flex-col items-center gap-2 btn-pop ${
-                  isUnlocked ? 'bg-primary-500/20 hover:bg-primary-500/30' : 'bg-white/5 opacity-60'
-                }`}
+                className={`pixel-btn border-ink shadow-pixel-md p-5 flex flex-col items-center gap-2 h-auto
+                  ${isUnlocked
+                    ? 'bg-primary-500 hover:bg-primary-400 shadow-ink-soft'
+                    : 'bg-bg-card shadow-black opacity-70 cursor-not-allowed'}`}
               >
-                <div className="text-6xl">{isUnlocked ? '🎯' : '🔒'}</div>
-                <div className="text-xl font-display text-center">{t(level.labelKey, `Level ${idx + 1}`)}</div>
-                <div className="flex gap-1">
+                <PixelIcon name={isUnlocked ? 'play' : 'lock'} size={56} tone={isUnlocked ? 'white' : 'default'} />
+                <span className="font-pixel text-[14px] text-white text-center">{t(level.labelKey, `Level ${idx + 1}`)}</span>
+                <div className="flex gap-1 mt-1">
                   {[1, 2, 3].map((s) => (
-                    <span key={s} className={`text-2xl ${(entry?.stars ?? 0) >= s ? 'text-yellow-400' : 'text-white/20'}`}>⭐</span>
+                    <PixelIcon key={s} name={stars >= s ? 'star' : 'star-empty'} size={20} />
                   ))}
                 </div>
               </button>
             );
           })}
 
-          {/* Teaser für noch nicht implementierte Levels */}
           {activeWorld.levels.length < 8 && (
-            <div className="card-tile bg-white/5 p-6 flex flex-col items-center gap-2 opacity-40">
-              <div className="text-6xl">🚧</div>
-              <div className="text-lg font-display text-center">Bald verfügbar</div>
-              <div className="text-xs text-white/50">Mehr Welten kommen!</div>
+            <div className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-md p-5 flex flex-col items-center gap-2 opacity-50 cursor-default">
+              <PixelIcon name="lock" size={56} />
+              <span className="font-pixel text-[12px] text-white/60 text-center">Bald verfügbar</span>
             </div>
           )}
         </div>
@@ -139,41 +150,58 @@ export default function WorldMapScreen() {
     );
   }
 
-  // Level spielen
   if (view === 'level' && activeLevel) {
     const Component = activeLevel.component;
     return <Component onComplete={handleLevelComplete} onExit={() => setView('world')} />;
   }
 
-  // Level-Ergebnis
   if (view === 'level-result' && lastResult) {
     return (
       <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
-        <div className="text-9xl mb-6 animate-pop">{lastResult.stars >= 3 ? '🏆' : lastResult.stars >= 2 ? '🌟' : lastResult.stars >= 1 ? '👏' : '💪'}</div>
-        <h2 className="text-5xl font-display mb-3">
-          {lastResult.stars >= 1 ? 'Geschafft!' : 'Weiter geht\'s!'}
-        </h2>
+        <div className="mb-6 animate-pop">
+          <PixelIcon name="trophy" size={140} />
+        </div>
+        <PixelTitle size="lg" color="gold" className="mb-3">
+          {lastResult.stars >= 1 ? 'GESCHAFFT!' : 'WEITER GEHT\'S!'}
+        </PixelTitle>
         <div className="flex gap-3 my-6">
           {[1, 2, 3].map((s) => (
-            <span key={s} className={`text-7xl ${lastResult.stars >= s ? 'text-yellow-400 animate-pop' : 'text-white/20'}`}>⭐</span>
+            <div key={s} className={lastResult.stars >= s ? 'animate-pop' : ''} style={{ animationDelay: `${s * 100}ms` }}>
+              <PixelIcon name={lastResult.stars >= s ? 'star' : 'star-empty'} size={72} />
+            </div>
           ))}
         </div>
-        <p className="text-xl text-white/70 mb-2">
+        <p className="text-xl font-body text-white/70 mb-2">
           {lastResult.correct} von {lastResult.total} richtig
         </p>
-        <p className="text-amber-300 mb-8">+{lastResult.stars * 10 + lastResult.correct * 2} 🪙</p>
+        <div className="flex items-center gap-2 mb-8">
+          <PixelIcon name="coin" size={28} />
+          <span className="font-pixel text-[20px] text-accent-coin">+{lastResult.stars * 10 + lastResult.correct * 2}</span>
+        </div>
         <div className="flex gap-3">
-          <button onClick={() => setView('world')} className="px-6 py-3 rounded-full bg-white/10 font-display btn-pop">Welt</button>
-          <button onClick={() => setView('level')} className="px-6 py-3 rounded-full bg-primary-500 font-display btn-pop">Nochmal</button>
+          <PixelButton variant="ghost" size="md" onClick={() => setView('world')}>Welt</PixelButton>
+          <PixelButton variant="primary" size="md" onClick={() => setView('level')}>Nochmal</PixelButton>
         </div>
       </div>
     );
   }
 
-  // Avatar-Shop / Customization
   if (view === 'shop') {
     return <AvatarShop onClose={() => setView('islands')} />;
   }
 
   return null;
+}
+
+function SubjectIcon({ id }: { id: string }) {
+  if (id === 'math') {
+    return (
+      <div className="flex gap-2">
+        <PixelIcon name="plus" size={28} tone="white" />
+        <PixelIcon name="minus" size={28} tone="white" />
+        <PixelIcon name="equals" size={28} tone="white" />
+      </div>
+    );
+  }
+  return <PixelIcon name="lock" size={48} />;
 }

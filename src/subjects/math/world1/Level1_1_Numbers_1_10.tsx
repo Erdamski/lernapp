@@ -5,12 +5,13 @@ import { getRandomEncourageKey, getRandomPraiseKey } from '@engine/audio/manifes
 import { recordAttempt } from '@engine/progress/srs';
 import { useAppStore } from '@engine/state/store';
 import { shuffle } from '@engine/util/shuffle';
+import PixelIcon from '@ui/components/PixelIcon';
 import type { LevelProps, LevelResult } from '@subjects/types';
 
 /**
  * Level 1.1: Zahlen 1–10
  * Mengen erfassen → richtige Zahl auswählen.
- * EIS: ikonisch (Äpfel) + symbolisch (Zahlen). Touch-First, große Buttons.
+ * EIS: ikonisch (Pixel-Äpfel) + symbolisch (Zahlen). Touch-First, große Buttons.
  */
 export default function Level1_1({ onComplete, onExit }: LevelProps) {
   const { t } = useTranslation();
@@ -29,10 +30,7 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
   }, []);
 
   useEffect(() => {
-    if (current) {
-      const text = `Wie viele Äpfel siehst du?`;
-      audio.speak(text);
-    }
+    if (current) audio.speak('Wie viele Äpfel siehst du?');
   }, [taskIndex, current]);
 
   const handleAnswer = async (chosen: number) => {
@@ -53,11 +51,8 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
 
     setTimeout(() => {
       setFeedback(null);
-      if (taskIndex + 1 >= tasks.length) {
-        finalize();
-      } else {
-        setTaskIndex((i) => i + 1);
-      }
+      if (taskIndex + 1 >= tasks.length) finalize();
+      else setTaskIndex((i) => i + 1);
     }, 1400);
   };
 
@@ -85,36 +80,39 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-between p-6">
-      <header className="w-full flex items-center justify-between">
-        <button onClick={onExit} className="text-3xl btn-pop" aria-label="Zurück">⬅️</button>
-        <div className="flex items-center gap-3">
-          <span className="text-xl font-display">{taskIndex + 1} / {tasks.length}</span>
-        </div>
-        <button onClick={() => audio.speak('Wie viele Äpfel siehst du?')} className="text-3xl btn-pop" aria-label="Vorlesen">🔊</button>
+      <header className="w-full max-w-4xl flex items-center justify-between">
+        <button onClick={onExit} className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0" aria-label="Zurück">
+          <PixelIcon name="arrow-left" size={26} tone="white" />
+        </button>
+        <span className="font-pixel text-[20px]">{taskIndex + 1} / {tasks.length}</span>
+        <button
+          onClick={() => audio.speak('Wie viele Äpfel siehst du?')}
+          className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0"
+          aria-label="Vorlesen"
+        >
+          <PixelIcon name="speaker" size={26} tone="white" />
+        </button>
       </header>
 
-      <div className="flex-1 w-full flex flex-col items-center justify-center gap-8">
-        <div className="text-2xl font-display text-white/80">Wie viele Äpfel siehst du?</div>
-
-        <div className="grid grid-cols-5 gap-3 max-w-2xl">
-          {Array.from({ length: current.answer }).map((_, i) => (
-            <div key={i} className="text-6xl text-center animate-pop" style={{ animationDelay: `${i * 50}ms` }}>🍎</div>
-          ))}
+      <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
+        <div className="text-4xl sm:text-5xl font-body font-bold text-white/90 text-center">
+          Wie viele Äpfel siehst du?
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mt-6">
+        <CountRow count={current.answer} icon="apple" />
+
+        <div className="flex justify-center gap-5 mt-4">
           {current.options.map((opt) => (
             <button
               key={opt}
               onClick={() => handleAnswer(opt)}
               disabled={feedback !== null}
-              className={`w-24 h-24 rounded-3xl text-5xl font-display btn-pop card-tile ${
-                feedback === 'correct' && opt === current.answer
-                  ? 'bg-green-500'
+              className={`pixel-btn border-ink rounded-chunk shadow-pixel-lg w-32 h-32 sm:w-36 sm:h-36 text-[44px] sm:text-[52px] font-pixel text-white transition-colors
+                ${feedback === 'correct' && opt === current.answer
+                  ? 'bg-accent-success shadow-emerald-900'
                   : feedback === 'wrong' && opt === current.answer
-                    ? 'bg-green-500'
-                    : 'bg-primary-500 hover:bg-primary-400'
-              }`}
+                    ? 'bg-accent-success shadow-emerald-900'
+                    : 'bg-primary-500 hover:bg-primary-400 shadow-ink-soft'}`}
             >
               {opt}
             </button>
@@ -122,10 +120,27 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
         </div>
       </div>
 
-      <footer className="text-white/60 text-sm">
-        {feedback === 'correct' && <span className="text-green-400 text-2xl font-display">{t('task.correct')}</span>}
-        {feedback === 'wrong' && <span className="text-amber-300 text-2xl font-display">{t('task.wrong')}</span>}
+      <footer className="font-pixel text-[18px] h-10">
+        {feedback === 'correct' && <span className="text-accent-success">{t('task.correct')}</span>}
+        {feedback === 'wrong' && <span className="text-accent-warn">{t('task.wrong')}</span>}
       </footer>
+    </div>
+  );
+}
+
+/**
+ * Zeigt 1–10 Items in EINER Zeile. Größe schrumpft dynamisch
+ * mit Anzahl, sodass alles ohne Umbruch reinpasst.
+ */
+export function CountRow({ count, icon }: { count: number; icon: 'apple' | 'star' }) {
+  const baseSize = count <= 4 ? 110 : count <= 6 ? 92 : count <= 8 ? 76 : 64;
+  return (
+    <div className="flex flex-row items-center justify-center gap-3 max-w-full">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="animate-pop shrink-0" style={{ animationDelay: `${i * 50}ms` }}>
+          <PixelIcon name={icon} size={baseSize} />
+        </div>
+      ))}
     </div>
   );
 }
@@ -142,8 +157,6 @@ function generateTasks(count: number): CountTask[] {
     const answer = Math.floor(Math.random() * 9) + 2; // 2..10
     if (used.has(answer)) continue;
     used.add(answer);
-
-    // Bilde 3 eindeutige Optionen mit der richtigen + 2 Distraktoren in der Nähe.
     const distractorPool = new Set<number>();
     while (distractorPool.size < 2) {
       const offset = pickFrom([-2, -1, 1, 2]);

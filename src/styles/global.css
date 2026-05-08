@@ -8,16 +8,15 @@
     width: 100%;
     margin: 0;
     padding: 0;
+    background: #0a0e27;
   }
   body {
     -webkit-tap-highlight-color: transparent;
     -webkit-user-select: none;
     user-select: none;
     overscroll-behavior: none;
-    font-family: 'Nunito', system-ui, sans-serif;
-  }
-  h1, h2, h3, button {
-    font-family: 'Fredoka', system-ui, sans-serif;
+    font-family: 'Baloo 2', 'Fredoka', system-ui, sans-serif;
+    font-weight: 600;
   }
   /* Disable iOS double-tap zoom */
   * {
@@ -26,10 +25,44 @@
 }
 
 @layer components {
-  .btn-pop {
-    @apply transition-transform active:scale-95;
+  /* Pixel-Button-Basis – siehe STYLEGUIDE §3 */
+  .pixel-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: 'Press Start 2P', system-ui, monospace;
+    border-width: 4px;
+    border-radius: 6px;
+    transition: all 100ms;
+    user-select: none;
+    cursor: pointer;
+    text-rendering: geometricPrecision;
+    image-rendering: pixelated;
   }
-  .card-tile {
-    @apply rounded-3xl shadow-xl border-4 border-white/10 backdrop-blur;
+  .pixel-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 4px;
+    box-shadow: inset 0 3px 0 0 rgba(255, 255, 255, 0.25);
+    pointer-events: none;
+  }
+  .pixel-btn:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 0 var(--tw-shadow-color) !important;
+  }
+  .pixel-btn:disabled {
+    opacity: 0.4;
+    box-shadow: 0 2px 0 0 var(--tw-shadow-color);
+  }
+
+  /* Pixel-Headline */
+  .pixel-headline {
+    font-family: 'Press Start 2P', system-ui, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-shadow: 4px 4px 0 #0a0a14;
   }
 }

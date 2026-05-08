@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import PixelIcon from './PixelIcon';
 
 interface Props {
   title: string;
@@ -75,19 +76,19 @@ export default function PinPad({ title, expectedPin, pinLength = 4, onSuccess, o
             <button
               key={d}
               onClick={() => press(d)}
-              className="w-full aspect-square rounded-2xl bg-white/10 hover:bg-white/20 text-3xl font-display btn-pop"
+              className="pixel-btn bg-bg-card hover:bg-primary-500/40 border-ink-soft shadow-black shadow-pixel-sm w-full aspect-square text-3xl text-white"
             >
               {d}
             </button>
           ))}
-          <button onClick={onCancel} className="w-full aspect-square rounded-2xl bg-white/5 text-base font-display btn-pop">
-            ✕
+          <button onClick={onCancel} className="pixel-btn bg-bg-mid border-ink-soft shadow-black shadow-pixel-sm w-full aspect-square text-2xl">
+            <PixelIcon name="cross" size={24} tone="white" />
           </button>
-          <button onClick={() => press('0')} className="w-full aspect-square rounded-2xl bg-white/10 hover:bg-white/20 text-3xl font-display btn-pop">
+          <button onClick={() => press('0')} className="pixel-btn bg-bg-card hover:bg-primary-500/40 border-ink-soft shadow-black shadow-pixel-sm w-full aspect-square text-3xl text-white">
             0
           </button>
-          <button onClick={erase} className="w-full aspect-square rounded-2xl bg-white/5 text-2xl font-display btn-pop">
-            ⌫
+          <button onClick={erase} className="pixel-btn bg-bg-mid border-ink-soft shadow-black shadow-pixel-sm w-full aspect-square text-xl">
+            <PixelIcon name="arrow-left" size={20} tone="white" />
           </button>
         </div>
       </div>

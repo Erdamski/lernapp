@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useAppStore } from '@engine/state/store';
 import { db } from '@engine/db/schema';
 import PixelCharacter from '@ui/components/PixelCharacter';
+import PixelButton from '@ui/components/PixelButton';
+import PixelIcon, { type IconName } from '@ui/components/PixelIcon';
+import PixelTitle from '@ui/components/PixelTitle';
 import {
   BOTTOM_COLORS,
   BOTTOM_OPTIONS,
@@ -26,25 +29,28 @@ interface Props {
 type Tab = 'skin' | 'hair' | 'haircolor' | 'top' | 'bottom';
 
 const HAIR_LABELS: Record<HairId, string> = {
-  short: 'Kurz',
-  spiky: 'Stachel',
-  long: 'Lang',
-  pony: 'Pferdeschwanz',
-  bun: 'Dutt',
-  curly: 'Locken',
+  short: 'KURZ',
+  spiky: 'STACHEL',
+  long: 'LANG',
+  pony: 'ZOPF',
+  bun: 'DUTT',
+  curly: 'LOCKEN',
 };
 
-/**
- * Ankleidezimmer: Pixel-Charakter anpassen.
- * Big tabs unten, viele Tap-Flächen, sofortige Vorschau oben.
- */
+const TABS: { id: Tab; label: string; icon: IconName }[] = [
+  { id: 'skin', label: 'HAUT', icon: 'skin' },
+  { id: 'hair', label: 'FRISUR', icon: 'hair' },
+  { id: 'haircolor', label: 'HAARFARBE', icon: 'paint' },
+  { id: 'top', label: 'OBERTEIL', icon: 'shirt' },
+  { id: 'bottom', label: 'HOSE', icon: 'pants' },
+];
+
 export default function AvatarShop({ onClose }: Props) {
   const profile = useAppStore((s) => s.activeProfile);
   const refresh = useAppStore((s) => s.refreshActiveProfile);
   const [tab, setTab] = useState<Tab>('hair');
 
   if (!profile) return null;
-
   const character = profile.character;
 
   const update = async (patch: Partial<CharacterConfig>) => {
@@ -56,45 +62,52 @@ export default function AvatarShop({ onClose }: Props) {
   return (
     <div className="w-full h-full flex flex-col p-6 overflow-y-auto">
       <header className="flex items-center justify-between max-w-4xl mx-auto w-full mb-4">
-        <button onClick={onClose} className="text-3xl btn-pop">⬅️</button>
-        <h2 className="text-3xl font-display">👕 Ankleidezimmer</h2>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-400/20">
-          <span className="text-xl">⭐</span>
-          <span className="font-display">{profile.totalStars}</span>
+        <button onClick={onClose} className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0">
+          <PixelIcon name="arrow-left" size={26} tone="white" />
+        </button>
+        <PixelTitle size="md">ANKLEIDEN</PixelTitle>
+        <div className="pixel-btn bg-accent-coin border-ink shadow-amber-700 shadow-pixel-sm h-12 px-3 flex items-center gap-2 cursor-default">
+          <PixelIcon name="star" size={20} />
+          <span className="font-pixel text-[12px] text-ink">{profile.totalStars}</span>
         </div>
       </header>
 
       <div className="flex justify-center mb-6">
-        <div className="rounded-3xl p-2 bg-gradient-to-b from-indigo-700 to-indigo-900 shadow-2xl">
+        <div className="rounded-chunk p-3 bg-gradient-to-b from-indigo-700 to-indigo-900 shadow-pixel-md shadow-ink border-4 border-ink">
           <PixelCharacter config={character} size={220} bg={null} />
         </div>
       </div>
 
       <div className="flex justify-center gap-2 mb-4 flex-wrap">
-        <TabBtn active={tab === 'skin'} onClick={() => setTab('skin')}>🧑 Haut</TabBtn>
-        <TabBtn active={tab === 'hair'} onClick={() => setTab('hair')}>💇 Frisur</TabBtn>
-        <TabBtn active={tab === 'haircolor'} onClick={() => setTab('haircolor')}>🎨 Haarfarbe</TabBtn>
-        <TabBtn active={tab === 'top'} onClick={() => setTab('top')}>👕 Oberteil</TabBtn>
-        <TabBtn active={tab === 'bottom'} onClick={() => setTab('bottom')}>👖 Hose</TabBtn>
+        {TABS.map((tDef) => (
+          <button
+            key={tDef.id}
+            onClick={() => setTab(tDef.id)}
+            className={`pixel-btn border-ink shadow-pixel-sm h-12 px-3 flex items-center gap-2
+              ${tab === tDef.id ? 'bg-primary-500 shadow-ink-soft' : 'bg-bg-card shadow-black hover:bg-bg-mid'}`}
+          >
+            <PixelIcon name={tDef.icon} size={20} />
+            <span className="font-pixel text-[10px] text-white">{tDef.label}</span>
+          </button>
+        ))}
       </div>
 
-      <div className="max-w-3xl mx-auto w-full">
+      <div className="max-w-3xl mx-auto w-full pb-8">
         {tab === 'skin' && (
-          <div className="grid grid-cols-5 gap-3">
+          <Grid>
             {SKIN_OPTIONS.map((id) => (
               <PreviewCard
                 key={id}
                 active={character.skinId === id}
                 onClick={() => update({ skinId: id })}
-                label={SKIN_COLORS[id].label}
+                label={SKIN_COLORS[id].label.toUpperCase()}
                 preview={<PixelCharacter config={{ ...character, skinId: id }} size={90} bg={null} />}
               />
             ))}
-          </div>
+          </Grid>
         )}
-
         {tab === 'hair' && (
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+          <Grid>
             {HAIR_OPTIONS.map((id) => (
               <PreviewCard
                 key={id}
@@ -104,80 +117,83 @@ export default function AvatarShop({ onClose }: Props) {
                 preview={<PixelCharacter config={{ ...character, hairId: id }} size={90} bg={null} />}
               />
             ))}
-          </div>
+          </Grid>
         )}
-
         {tab === 'haircolor' && (
-          <div className="grid grid-cols-5 gap-3">
+          <Grid>
             {HAIR_COLOR_OPTIONS.map((id) => (
               <PreviewCard
                 key={id}
                 active={character.hairColorId === id}
                 onClick={() => update({ hairColorId: id as HairColorId })}
-                label={HAIR_COLORS[id].label}
+                label={HAIR_COLORS[id].label.toUpperCase()}
                 preview={
-                  <div className="w-[90px] h-[90px] rounded-2xl flex items-center justify-center" style={{ background: HAIR_COLORS[id].fill }}>
+                  <div className="w-[90px] h-[90px] rounded-chunk flex items-center justify-center" style={{ background: HAIR_COLORS[id].fill }}>
                     <PixelCharacter config={{ ...character, hairColorId: id }} size={70} bg={null} />
                   </div>
                 }
               />
             ))}
-          </div>
+          </Grid>
         )}
-
         {tab === 'top' && (
-          <div className="grid grid-cols-5 gap-3">
+          <Grid>
             {TOP_OPTIONS.map((id) => (
               <PreviewCard
                 key={id}
                 active={character.topId === id}
                 onClick={() => update({ topId: id as TopId })}
-                label={TOP_COLORS[id].label}
+                label={TOP_COLORS[id].label.toUpperCase()}
                 preview={<PixelCharacter config={{ ...character, topId: id }} size={90} bg={null} />}
               />
             ))}
-          </div>
+          </Grid>
         )}
-
         {tab === 'bottom' && (
-          <div className="grid grid-cols-5 gap-3">
+          <Grid>
             {BOTTOM_OPTIONS.map((id) => (
               <PreviewCard
                 key={id}
                 active={character.bottomId === id}
                 onClick={() => update({ bottomId: id as BottomId })}
-                label={BOTTOM_COLORS[id].label}
+                label={BOTTOM_COLORS[id].label.toUpperCase()}
                 preview={<PixelCharacter config={{ ...character, bottomId: id }} size={90} bg={null} />}
               />
             ))}
-          </div>
+          </Grid>
         )}
+
+        <div className="flex justify-center mt-6">
+          <PixelButton variant="success" size="lg" onClick={onClose}>FERTIG</PixelButton>
+        </div>
       </div>
     </div>
   );
 }
 
-function TabBtn({ active, children, onClick }: { active: boolean; children: React.ReactNode; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-5 py-2 rounded-full font-display btn-pop ${active ? 'bg-primary-500' : 'bg-white/10 hover:bg-white/20'}`}
-    >
-      {children}
-    </button>
-  );
+function Grid({ children }: { children: React.ReactNode }) {
+  return <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">{children}</div>;
 }
 
-function PreviewCard({ active, onClick, label, preview }: { active: boolean; onClick: () => void; label: string; preview: React.ReactNode }) {
+function PreviewCard({
+  active,
+  onClick,
+  label,
+  preview,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+  preview: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}
-      className={`card-tile p-2 flex flex-col items-center gap-1 btn-pop ${
-        active ? 'bg-primary-500/40 ring-4 ring-primary-300' : 'bg-white/5 hover:bg-white/10'
-      }`}
+      className={`pixel-btn border-ink shadow-pixel-sm p-2 flex flex-col items-center gap-1 h-auto
+        ${active ? 'bg-primary-500 shadow-ink-soft' : 'bg-bg-card shadow-black hover:bg-bg-mid'}`}
     >
       {preview}
-      <div className="text-sm font-display">{label}</div>
+      <span className="font-pixel text-[9px] text-white">{label}</span>
     </button>
   );
 }
