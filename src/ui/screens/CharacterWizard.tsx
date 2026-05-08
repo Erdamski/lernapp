@@ -143,10 +143,11 @@ export default function CharacterWizard(props: Props) {
         </div>
       </header>
 
-      {/* 3-Spalten-Body (auf Mobile gestapelt) */}
-      <main className="flex-1 overflow-hidden flex flex-col lg:flex-row min-h-0">
+      {/* 3-Spalten-Body (auf Mobile gestapelt).
+          Mobile: gesamtes <main> scrollt. Desktop: nur die Optionen-Spalte scrollt. */}
+      <main className="flex-1 min-h-0 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
         {/* Kategorien-Sidebar (oben auf Mobile) */}
-        <aside className="lg:w-56 lg:border-r-4 border-b-4 lg:border-b-0 border-ink bg-bg-mid/40 overflow-x-auto lg:overflow-y-auto">
+        <aside className="lg:w-56 lg:border-r-4 border-b-4 lg:border-b-0 border-ink bg-bg-mid/40 overflow-x-auto lg:overflow-y-auto shrink-0">
           <ul className="flex lg:flex-col gap-2 p-3 min-w-max lg:min-w-0">
             {STEPS.map((stepId, i) => {
               const def = CATEGORIES.find((c) => c.id === stepId);
@@ -175,14 +176,16 @@ export default function CharacterWizard(props: Props) {
         </aside>
 
         {/* Live-Preview Center */}
-        <section className="flex items-center justify-center p-6 lg:flex-1 lg:min-w-0 bg-bg-deep">
+        <section className="flex items-center justify-center p-6 lg:flex-1 lg:min-w-0 bg-bg-deep shrink-0">
           <div className="rounded-chunk p-4 bg-gradient-to-b from-indigo-700 to-indigo-900 shadow-pixel-md shadow-ink">
-            <PixelCharacter config={character} size={400} bg={null} />
+            <PixelCharacter config={character} size={360} bg={null} />
           </div>
         </section>
 
-        {/* Optionen rechts (oder unten auf Mobile) */}
-        <section className="lg:w-[420px] lg:border-l-4 border-t-4 lg:border-t-0 border-ink bg-bg-mid/30 overflow-y-auto p-5">
+        {/* Optionen rechts (oder unten auf Mobile).
+            Auf Desktop: feste Breite, eigener Scroll. Auf Mobile: volle Breite, kein eigener Scroll
+            (Parent <main> scrollt). */}
+        <section className="lg:w-[420px] lg:border-l-4 border-t-4 lg:border-t-0 border-ink bg-bg-mid/30 lg:overflow-y-auto p-5 pb-10">
           {currentStep === 'skin' && (
             <Section title="FARBE">
               <PreviewGrid
