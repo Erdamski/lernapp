@@ -176,8 +176,8 @@ export default function CharacterWizard(props: Props) {
 
         {/* Live-Preview Center */}
         <section className="flex items-center justify-center p-6 lg:flex-1 lg:min-w-0 bg-bg-deep">
-          <div className="rounded-chunk p-4 bg-gradient-to-b from-indigo-700 to-indigo-900 shadow-pixel-md shadow-ink border-4 border-ink">
-            <PixelCharacter config={character} size={260} bg={null} />
+          <div className="rounded-chunk p-4 bg-gradient-to-b from-indigo-700 to-indigo-900 shadow-pixel-md shadow-ink">
+            <PixelCharacter config={character} size={400} bg={null} />
           </div>
         </section>
 
@@ -185,8 +185,12 @@ export default function CharacterWizard(props: Props) {
         <section className="lg:w-[420px] lg:border-l-4 border-t-4 lg:border-t-0 border-ink bg-bg-mid/30 overflow-y-auto p-5">
           {currentStep === 'skin' && (
             <Section title="FARBE">
-              <SwatchGrid
-                options={SKIN_OPTIONS.map((id) => ({ id, label: SKIN_COLORS[id].label.toUpperCase(), color: SKIN_COLORS[id].fill }))}
+              <PreviewGrid
+                options={SKIN_OPTIONS.map((id) => ({
+                  id,
+                  label: SKIN_COLORS[id].label.toUpperCase(),
+                  preview: <PixelCharacter config={{ ...character, skinId: id }} size={88} bg={null} crop="head" />,
+                }))}
                 value={character.skinId}
                 onChange={(id) => setCharacter({ ...character, skinId: id as SkinId })}
               />
@@ -200,7 +204,7 @@ export default function CharacterWizard(props: Props) {
                   options={HAIR_OPTIONS.map((id) => ({
                     id,
                     label: HAIR_LABELS[id].toUpperCase(),
-                    preview: <PixelCharacter config={{ ...character, hairId: id }} size={80} bg={null} />,
+                    preview: <PixelCharacter config={{ ...character, hairId: id }} size={88} bg={null} crop="head" />,
                   }))}
                   value={character.hairId}
                   onChange={(id) => setCharacter({ ...character, hairId: id as HairId })}
@@ -223,7 +227,7 @@ export default function CharacterWizard(props: Props) {
                   options={TOP_TYPE_OPTIONS.map((id) => ({
                     id,
                     label: TOP_TYPE_LABELS[id].toUpperCase(),
-                    preview: <PixelCharacter config={{ ...character, topTypeId: id }} size={80} bg={null} />,
+                    preview: <PixelCharacter config={{ ...character, topTypeId: id }} size={88} bg={null} crop="top" />,
                   }))}
                   value={character.topTypeId}
                   onChange={(id) => setCharacter({ ...character, topTypeId: id as TopType })}
@@ -246,7 +250,7 @@ export default function CharacterWizard(props: Props) {
                   options={BOTTOM_TYPE_OPTIONS.map((id) => ({
                     id,
                     label: BOTTOM_TYPE_LABELS[id].toUpperCase(),
-                    preview: <PixelCharacter config={{ ...character, bottomTypeId: id }} size={80} bg={null} />,
+                    preview: <PixelCharacter config={{ ...character, bottomTypeId: id }} size={88} bg={null} crop="bottom" />,
                   }))}
                   value={character.bottomTypeId}
                   onChange={(id) => setCharacter({ ...character, bottomTypeId: id as BottomType })}
@@ -268,7 +272,7 @@ export default function CharacterWizard(props: Props) {
                 options={SHOE_OPTIONS.map((id) => ({
                   id,
                   label: SHOE_LABELS[id].toUpperCase(),
-                  preview: <PixelCharacter config={{ ...character, shoeId: id }} size={80} bg={null} />,
+                  preview: <PixelCharacter config={{ ...character, shoeId: id }} size={88} bg={null} crop="shoe" />,
                 }))}
                 value={character.shoeId}
                 onChange={(id) => setCharacter({ ...character, shoeId: id as ShoeId })}
@@ -277,12 +281,12 @@ export default function CharacterWizard(props: Props) {
           )}
 
           {currentStep === 'equipment' && (
-            <Section title="WAS DAGEGEN">
+            <Section title="TYP">
               <PreviewGrid
                 options={EQUIPMENT_OPTIONS.map((id) => ({
                   id,
                   label: EQUIPMENT_LABELS[id].toUpperCase(),
-                  preview: <PixelCharacter config={{ ...character, equipmentId: id }} size={80} bg={null} />,
+                  preview: <PixelCharacter config={{ ...character, equipmentId: id }} size={88} bg={null} crop="equipment" />,
                 }))}
                 value={character.equipmentId}
                 onChange={(id) => setCharacter({ ...character, equipmentId: id as EquipmentId })}
@@ -351,10 +355,10 @@ function PreviewGrid({ options, value, onChange }: { options: PreviewItem[]; val
         <button
           key={opt.id}
           onClick={() => onChange(opt.id)}
-          className={`pixel-btn border-ink shadow-pixel-sm p-2 flex flex-col items-center gap-1 h-auto
-            ${value === opt.id ? 'bg-primary-500 shadow-ink-soft' : 'bg-bg-card shadow-black hover:bg-bg-mid'}`}
+          className={`rounded-chunk p-2 flex flex-col items-center gap-1 transition-colors active:scale-95
+            ${value === opt.id ? 'bg-primary-500 ring-4 ring-accent-coin' : 'bg-bg-card hover:bg-bg-mid'}`}
         >
-          {opt.preview}
+          <div className="w-[88px] h-[88px] flex items-center justify-center">{opt.preview}</div>
           <span className="font-pixel text-[9px] text-white whitespace-nowrap">{opt.label}</span>
         </button>
       ))}
@@ -371,13 +375,10 @@ function SwatchGrid({ options, value, onChange }: { options: SwatchItem[]; value
         <button
           key={opt.id}
           onClick={() => onChange(opt.id)}
-          className={`pixel-btn border-ink shadow-pixel-sm p-2 flex flex-col items-center gap-1 h-auto
-            ${value === opt.id ? 'bg-primary-500 shadow-ink-soft' : 'bg-bg-card shadow-black hover:bg-bg-mid'}`}
+          className={`rounded-chunk p-2 flex flex-col items-center gap-1 transition-colors active:scale-95
+            ${value === opt.id ? 'bg-primary-500 ring-4 ring-accent-coin' : 'bg-bg-card hover:bg-bg-mid'}`}
         >
-          <div
-            className="w-14 h-14 border-2 border-ink"
-            style={{ background: opt.color }}
-          />
+          <div className="w-16 h-16" style={{ background: opt.color }} />
           <span className="font-pixel text-[9px] text-white">{opt.label}</span>
         </button>
       ))}
@@ -411,8 +412,9 @@ function DetailsForm({
           onChange={(e) => onName(e.target.value)}
           autoFocus
           placeholder="Dein Name"
-          className="mt-2 w-full bg-bg-card border-4 border-ink-soft rounded-chunk p-3 text-white text-2xl font-body font-bold"
           maxLength={20}
+          style={INPUT_STYLE}
+          className="mt-2 w-full text-2xl font-body font-bold"
         />
       </label>
       <label className="block">
@@ -423,7 +425,8 @@ function DetailsForm({
           min={4}
           max={14}
           onChange={(e) => onAge(parseInt(e.target.value) || 6)}
-          className="mt-2 w-full bg-bg-card border-4 border-ink-soft rounded-chunk p-3 text-white text-2xl font-body font-bold"
+          style={INPUT_STYLE}
+          className="mt-2 w-full text-2xl font-body font-bold"
         />
       </label>
       <label className="block">
@@ -431,10 +434,11 @@ function DetailsForm({
         <select
           value={language}
           onChange={(e) => onLanguage(e.target.value as SupportedLanguage)}
-          className="mt-2 w-full bg-bg-card border-4 border-ink-soft rounded-chunk p-3 text-white text-2xl font-body font-bold"
+          style={SELECT_STYLE}
+          className="mt-2 w-full text-2xl font-body font-bold"
         >
           {SUPPORTED_LANGUAGES.map((l) => (
-            <option key={l} value={l}>{LANGUAGE_LABELS[l]}</option>
+            <option key={l} value={l} style={{ background: '#23264a', color: '#ffffff' }}>{LANGUAGE_LABELS[l]}</option>
           ))}
         </select>
       </label>
@@ -442,3 +446,23 @@ function DetailsForm({
     </div>
   );
 }
+
+const INPUT_STYLE: React.CSSProperties = {
+  background: '#23264a',
+  color: '#ffffff',
+  border: '4px solid #1e1b4b',
+  borderRadius: 6,
+  padding: '12px 16px',
+  outline: 'none',
+  appearance: 'none',
+  WebkitAppearance: 'none',
+};
+
+const SELECT_STYLE: React.CSSProperties = {
+  ...INPUT_STYLE,
+  // Dropdown-Pfeil als SVG, da appearance: none den nativen entfernt
+  backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'16\' height=\'16\' viewBox=\'0 0 16 16\'><polygon points=\'4,6 12,6 8,11\' fill=\'white\'/></svg>")',
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'right 16px center',
+  paddingRight: 48,
+};

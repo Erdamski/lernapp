@@ -11,27 +11,44 @@ import {
   type EquipmentId,
 } from '@engine/avatar/character';
 
+export type CharacterCrop = 'all' | 'head' | 'top' | 'bottom' | 'shoe' | 'equipment' | 'hair';
+
 interface Props {
   config: CharacterConfig;
   size?: number;
   bg?: string | null;
+  /** Zeigt nur einen Ausschnitt des Charakters (z. B. nur Kopf, nur Beine). */
+  crop?: CharacterCrop;
 }
+
+const CROP_BOXES: Record<CharacterCrop, { x: number; y: number; w: number; h: number }> = {
+  all:        { x: 0,  y: 0,  w: 32, h: 48 },
+  head:       { x: 4,  y: 0,  w: 24, h: 22 },
+  hair:       { x: 4,  y: 0,  w: 24, h: 14 },
+  top:        { x: 0,  y: 18, w: 32, h: 20 },
+  bottom:     { x: 4,  y: 30, w: 24, h: 16 },
+  shoe:       { x: 4,  y: 38, w: 24, h: 10 },
+  // Equipment-Crop zeigt die rechte Hand mit Item
+  equipment:  { x: 16, y: 12, w: 16, h: 24 },
+};
 
 /**
  * Minecraft-inspirierter Pixel-Charakter, gerendert als SVG (32×48 Pixel-Grid).
  * Rendert je nach topType/bottomType/shoeId/equipmentId unterschiedliche Formen.
  */
-export default memo(function PixelCharacter({ config, size = 96, bg = '#1f1d2e' }: Props) {
+export default memo(function PixelCharacter({ config, size = 96, bg = '#1f1d2e', crop = 'all' }: Props) {
   const skin = SKIN_COLORS[config.skinId];
   const hair = HAIR_COLORS[config.hairColorId];
   const top = CLOTH_COLORS[config.topColorId];
   const bottom = CLOTH_COLORS[config.bottomColorId];
+  const box = CROP_BOXES[crop];
 
   return (
     <svg
-      viewBox="0 0 32 48"
+      viewBox={`${box.x} ${box.y} ${box.w} ${box.h}`}
       width={size}
       height={size}
+      preserveAspectRatio="xMidYMid meet"
       style={{ shapeRendering: 'crispEdges', imageRendering: 'pixelated', display: 'block' }}
     >
       {bg && <rect x="0" y="0" width="32" height="48" fill={bg} rx="4" />}
@@ -63,7 +80,7 @@ export default memo(function PixelCharacter({ config, size = 96, bg = '#1f1d2e' 
       <Top type={config.topTypeId} color={top} skin={skin} />
 
       {/* Beine */}
-      <Bottom type={config.bottomTypeId} color={bottom} skin={skin} dressColor={config.topTypeId === 'dress' ? top : undefined} />
+      <Bottom type={config.bottomTypeId} color={bottom} skin={skin} />
 
       {/* Schuhe */}
       <Shoes shoe={config.shoeId} skin={skin} />
@@ -227,24 +244,6 @@ function Top({ type, color, skin }: { type: TopType; color: ColorTriple; skin: S
           <rect x="24" y="33" width="4" height="2" fill={skin.shadow} />
         </>
       );
-    case 'dress':
-      return (
-        <>
-          {torso}
-          {/* Kurze Ärmel */}
-          <rect x="4" y="22" width="4" height="5" fill={color.fill} />
-          <rect x="4" y="26" width="4" height="1" fill={color.shadow} />
-          <rect x="24" y="22" width="4" height="5" fill={color.fill} />
-          <rect x="24" y="26" width="4" height="1" fill={color.shadow} />
-          <rect x="4" y="27" width="4" height="6" fill={skin.fill} />
-          <rect x="4" y="33" width="4" height="2" fill={skin.shadow} />
-          <rect x="24" y="27" width="4" height="6" fill={skin.fill} />
-          <rect x="24" y="33" width="4" height="2" fill={skin.shadow} />
-          {/* Kleid-Glocke unten */}
-          <rect x="6" y="35" width="20" height="6" fill={color.fill} />
-          <rect x="6" y="40" width="20" height="1" fill={color.shadow} />
-        </>
-      );
   }
 }
 
@@ -252,23 +251,11 @@ function Bottom({
   type,
   color,
   skin,
-  dressColor,
 }: {
   type: BottomType;
   color: ColorTriple;
   skin: SkinPair;
-  dressColor?: ColorTriple;
 }) {
-  // Wenn Kleid getragen wird, fällt der Rock-Bereich darunter weg (Beine = nackt).
-  if (dressColor) {
-    return (
-      <>
-        <rect x="9" y="41" width="6" height="5" fill={skin.fill} />
-        <rect x="17" y="41" width="6" height="5" fill={skin.fill} />
-      </>
-    );
-  }
-
   switch (type) {
     case 'long':
       return (
@@ -355,27 +342,55 @@ function Shoes({ shoe, skin }: { shoe: ShoeId; skin: SkinPair }) {
 }
 
 function Equipment({ equipment }: { equipment: EquipmentId }) {
+  // Items werden vor dem rechten Arm gerendert (x ≈ 24–30, y ≈ 18–35),
+  // sodass es klar in der Hand liegt – nicht hinter dem Rücken.
   switch (equipment) {
     case 'wand':
       return (
         <>
-          <rect x="2" y="20" width="2" height="2" fill="#fbbf24" />
-          <rect x="2" y="22" width="1" height="10" fill="#5b3a1a" />
+          {/* Stab schräg vom Hand-Bereich nach oben */}
+          <rect x="26" y="32" width="2" height="2" fill="#5b3a1a" />
+          <rect x="26" y="28" width="2" height="4" fill="#5b3a1a" />
+          <rect x="26" y="22" width="2" height="6" fill="#92400e" />
+          <rect x="26" y="18" width="2" height="4" fill="#5b3a1a" />
+          {/* Stern oben */}
+          <rect x="25" y="14" width="4" height="4" fill="#facc15" />
+          <rect x="24" y="15" width="6" height="2" fill="#facc15" />
+          <rect x="25" y="13" width="4" height="1" fill="#fef08a" />
+          <rect x="23" y="16" width="1" height="1" fill="#fef08a" />
+          <rect x="30" y="16" width="1" height="1" fill="#fef08a" />
         </>
       );
     case 'sword':
       return (
         <>
-          <rect x="0" y="22" width="3" height="2" fill="#5b3a1a" />
-          <rect x="3" y="20" width="1" height="6" fill="#cbd5e1" />
-          <rect x="2" y="19" width="3" height="1" fill="#cbd5e1" />
+          {/* Klinge nach oben gehalten */}
+          <rect x="26" y="14" width="2" height="14" fill="#e2e8f0" />
+          <rect x="26" y="14" width="1" height="14" fill="#ffffff" />
+          <rect x="27" y="14" width="1" height="14" fill="#94a3b8" />
+          <rect x="26" y="13" width="2" height="1" fill="#cbd5e1" />
+          {/* Parierstange */}
+          <rect x="24" y="28" width="6" height="2" fill="#5b3a1a" />
+          <rect x="24" y="28" width="6" height="1" fill="#a16207" />
+          {/* Griff */}
+          <rect x="26" y="30" width="2" height="4" fill="#5b3a1a" />
+          {/* Knauf */}
+          <rect x="25" y="34" width="4" height="2" fill="#facc15" />
         </>
       );
     case 'shield':
       return (
         <>
-          <rect x="1" y="24" width="3" height="6" fill="#92400e" />
-          <rect x="2" y="25" width="1" height="4" fill="#fbbf24" />
+          {/* Schild groß vor rechtem Arm */}
+          <rect x="24" y="22" width="8" height="14" fill="#92400e" />
+          <rect x="24" y="22" width="8" height="2" fill="#a16207" />
+          <rect x="24" y="34" width="8" height="2" fill="#7c2d12" />
+          {/* Innerer Schmuck (Plus-Symbol) */}
+          <rect x="27" y="24" width="2" height="10" fill="#facc15" />
+          <rect x="24" y="28" width="8" height="2" fill="#facc15" />
+          {/* Outline */}
+          <rect x="23" y="22" width="1" height="14" fill="#0a0a14" />
+          <rect x="32" y="22" width="1" height="14" fill="#0a0a14" />
         </>
       );
     case 'none':

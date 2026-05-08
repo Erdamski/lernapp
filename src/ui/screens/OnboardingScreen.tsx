@@ -154,12 +154,22 @@ export default function OnboardingScreen({ onDone }: Props) {
 }
 
 function PromptDisplay({ prompt }: { prompt: string }) {
-  // Format: "apple:N", "star:N" → eine Reihe Blöcke (oder Apfel)
+  // Format: "apple:N", "star:N" → echte Pixel-Icons (kein Block)
   if (prompt.includes(':')) {
     const [type, n] = prompt.split(':');
     const count = parseInt(n);
-    if (type === 'apple') return <BlockRow count={count} color="red" />;
-    if (type === 'star') return <BlockRow count={count} color="yellow" />;
+    if (type === 'apple' || type === 'star') {
+      const size = count <= 4 ? 96 : count <= 6 ? 80 : count <= 8 ? 68 : 56;
+      return (
+        <div className="flex flex-row items-center justify-center gap-3 max-w-full">
+          {Array.from({ length: count }).map((_, i) => (
+            <div key={i} className="animate-pop shrink-0" style={{ animationDelay: `${i * 40}ms` }}>
+              <PixelIcon name={type as 'apple' | 'star'} size={size} />
+            </div>
+          ))}
+        </div>
+      );
+    }
     return <BlockRow count={count} color="blue" />;
   }
   // Math expressions: 2+3 → 2 blaue + 3 grüne Blöcke (zum Zusammenzählen)

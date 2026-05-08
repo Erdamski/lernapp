@@ -30,7 +30,7 @@ export interface CharacterConfig {
 export type SkinId = 'light' | 'tan' | 'olive' | 'brown' | 'dark';
 export type HairId = 'short' | 'spiky' | 'long' | 'pony' | 'bun' | 'curly';
 export type HairColorId = 'black' | 'brown' | 'blonde' | 'red' | 'white';
-export type TopType = 'tshirt' | 'hoodie' | 'tank' | 'dress';
+export type TopType = 'tshirt' | 'hoodie' | 'tank';
 export type BottomType = 'long' | 'short' | 'jeans' | 'skirt';
 export type ClothColor = 'red' | 'blue' | 'yellow' | 'pink' | 'green' | 'purple' | 'orange' | 'grey' | 'brown';
 export type ShoeId = 'sneaker' | 'boot' | 'barefoot';
@@ -74,7 +74,7 @@ export const CHARACTER_PRESETS: CharacterPreset[] = [
   { id: 'boy_1', label: 'Max', config: { presetId: 'boy_1', skinId: 'tan', hairId: 'short', hairColorId: 'brown', topTypeId: 'tshirt', topColorId: 'red', bottomTypeId: 'long', bottomColorId: 'blue', shoeId: 'sneaker', equipmentId: 'none' } },
   { id: 'boy_2', label: 'Leo', config: { presetId: 'boy_2', skinId: 'light', hairId: 'spiky', hairColorId: 'black', topTypeId: 'hoodie', topColorId: 'green', bottomTypeId: 'jeans', bottomColorId: 'grey', shoeId: 'sneaker', equipmentId: 'none' } },
   { id: 'boy_3', label: 'Theo', config: { presetId: 'boy_3', skinId: 'brown', hairId: 'short', hairColorId: 'black', topTypeId: 'tshirt', topColorId: 'blue', bottomTypeId: 'long', bottomColorId: 'brown', shoeId: 'boot', equipmentId: 'none' } },
-  { id: 'girl_1', label: 'Mia', config: { presetId: 'girl_1', skinId: 'light', hairId: 'long', hairColorId: 'blonde', topTypeId: 'dress', topColorId: 'pink', bottomTypeId: 'skirt', bottomColorId: 'purple', shoeId: 'sneaker', equipmentId: 'none' } },
+  { id: 'girl_1', label: 'Mia', config: { presetId: 'girl_1', skinId: 'light', hairId: 'long', hairColorId: 'blonde', topTypeId: 'tshirt', topColorId: 'pink', bottomTypeId: 'skirt', bottomColorId: 'purple', shoeId: 'sneaker', equipmentId: 'none' } },
   { id: 'girl_2', label: 'Lina', config: { presetId: 'girl_2', skinId: 'tan', hairId: 'pony', hairColorId: 'brown', topTypeId: 'tshirt', topColorId: 'yellow', bottomTypeId: 'long', bottomColorId: 'blue', shoeId: 'sneaker', equipmentId: 'none' } },
   { id: 'girl_3', label: 'Ada', config: { presetId: 'girl_3', skinId: 'dark', hairId: 'bun', hairColorId: 'black', topTypeId: 'tank', topColorId: 'blue', bottomTypeId: 'short', bottomColorId: 'red', shoeId: 'sneaker', equipmentId: 'none' } },
 ];
@@ -82,14 +82,14 @@ export const CHARACTER_PRESETS: CharacterPreset[] = [
 export const SKIN_OPTIONS: SkinId[] = ['light', 'tan', 'olive', 'brown', 'dark'];
 export const HAIR_OPTIONS: HairId[] = ['short', 'spiky', 'long', 'pony', 'bun', 'curly'];
 export const HAIR_COLOR_OPTIONS: HairColorId[] = ['black', 'brown', 'blonde', 'red', 'white'];
-export const TOP_TYPE_OPTIONS: TopType[] = ['tshirt', 'hoodie', 'tank', 'dress'];
+export const TOP_TYPE_OPTIONS: TopType[] = ['tshirt', 'hoodie', 'tank'];
 export const BOTTOM_TYPE_OPTIONS: BottomType[] = ['long', 'short', 'jeans', 'skirt'];
 export const CLOTH_COLOR_OPTIONS: ClothColor[] = ['red', 'blue', 'yellow', 'pink', 'green', 'purple', 'orange', 'grey', 'brown'];
 export const SHOE_OPTIONS: ShoeId[] = ['sneaker', 'boot', 'barefoot'];
 export const EQUIPMENT_OPTIONS: EquipmentId[] = ['none', 'wand', 'sword', 'shield'];
 
 export const HAIR_LABELS: Record<HairId, string> = { short: 'Kurz', spiky: 'Stachel', long: 'Lang', pony: 'Zopf', bun: 'Dutt', curly: 'Locken' };
-export const TOP_TYPE_LABELS: Record<TopType, string> = { tshirt: 'T-Shirt', hoodie: 'Hoodie', tank: 'Tank', dress: 'Kleid' };
+export const TOP_TYPE_LABELS: Record<TopType, string> = { tshirt: 'T-Shirt', hoodie: 'Hoodie', tank: 'Tank' };
 export const BOTTOM_TYPE_LABELS: Record<BottomType, string> = { long: 'Lang', short: 'Shorts', jeans: 'Jeans', skirt: 'Rock' };
 export const SHOE_LABELS: Record<ShoeId, string> = { sneaker: 'Sneaker', boot: 'Stiefel', barefoot: 'Barfuß' };
 export const EQUIPMENT_LABELS: Record<EquipmentId, string> = { none: 'Nichts', wand: 'Zauberstab', sword: 'Schwert', shield: 'Schild' };
@@ -116,7 +116,7 @@ export function normalizeCharacter(input: unknown): CharacterConfig {
   // Old combined topId: 'tshirt_red', 'hoodie_green'
   if (typeof c.topId === 'string') {
     const [type, color] = c.topId.split('_');
-    if (type === 'tshirt' || type === 'hoodie' || type === 'tank' || type === 'dress') result.topTypeId = type;
+    if (type === 'tshirt' || type === 'hoodie' || type === 'tank') result.topTypeId = type;
     if (CLOTH_COLOR_OPTIONS.includes(color as ClothColor)) result.topColorId = color as ClothColor;
   }
   // Old combined bottomId: 'pants_blue', 'shorts_red', 'skirt_purple'
