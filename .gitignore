@@ -1,0 +1,57 @@
+# Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.vite/
+
+# Audio cache (generierte ElevenLabs-Dateien können groß werden)
+# Wir entscheiden später, ob committen oder nicht
+# audio/generated/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Claude Code lokal (settings.local.json kann persönliche Einstellungen enthalten)
+.claude/settings.local.json
+
+# Temporäre Dateien
+tmp/
+temp/
+*.tmp
