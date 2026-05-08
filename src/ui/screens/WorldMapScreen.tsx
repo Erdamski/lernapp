@@ -139,9 +139,24 @@ export default function WorldMapScreen() {
     return <Component onComplete={handleLevelComplete} onExit={() => setView('world')} />;
   }
 
-  if (view === 'level-result' && lastResult) {
+  if (view === 'level-result' && lastResult && activeWorld && activeLevel) {
+    // Nächstes Level im selben World, nur wenn aktuelles Level mit min. 1 Stern bestanden
+    const currentIdx = activeWorld.levels.findIndex((l) => l.id === activeLevel.id);
+    const nextLevel = lastResult.stars >= 1 && currentIdx >= 0 ? activeWorld.levels[currentIdx + 1] : undefined;
     return (
-      <LevelResultScreen result={lastResult} onWorld={() => setView('world')} onAgain={() => setView('level')} />
+      <LevelResultScreen
+        result={lastResult}
+        onWorld={() => setView('world')}
+        onAgain={() => setView('level')}
+        onNext={
+          nextLevel
+            ? () => {
+                setActiveLevel(nextLevel);
+                setView('level');
+              }
+            : undefined
+        }
+      />
     );
   }
   if (view === 'shop') {
@@ -165,13 +180,30 @@ export default function WorldMapScreen() {
 /**
  * Level-Ergebnis-Screen mit gestaffelter Stern-Animation und Sound-Sequenz.
  */
-function LevelResultScreen({ result, onWorld, onAgain }: { result: LevelResult; onWorld: () => void; onAgain: () => void }) {
+function LevelResultScreen({
+  result,
+  onWorld,
+  onAgain,
+  onNext,
+}: {
+  result: LevelResult;
+  onWorld: () => void;
+  onAgain: () => void;
+  onNext?: () => void;
+}) {
   useEffect(() => {
-    // Sterne nacheinander mit Sound enthüllen
     for (let i = 0; i < result.stars; i++) {
       window.setTimeout(() => sfx.star(), 200 + i * 350);
     }
-  }, [result.stars]);
+    // Debug: prüft ob Stars/Correct korrekt berechnet wurden
+    console.info('[LevelResult]', {
+      correct: result.correct,
+      total: result.total,
+      accuracy: result.correct / result.total,
+      stars: result.stars,
+      attempts: result.attempts,
+    });
+  }, [result]);
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
@@ -195,9 +227,19 @@ function LevelResultScreen({ result, onWorld, onAgain }: { result: LevelResult; 
         <PixelIcon name="coin" size={28} />
         <span className="font-pixel text-[20px] text-accent-coin">+{result.stars * 10 + result.correct * 2}</span>
       </div>
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3 justify-center">
         <PixelButton variant="ghost" size="md" onClick={onWorld}>Welt</PixelButton>
-        <PixelButton variant="primary" size="md" onClick={onAgain}>Nochmal</PixelButton>
+        <PixelButton variant="ghost" size="md" onClick={onAgain}>Nochmal</PixelButton>
+        {onNext && (
+          <PixelButton
+            variant="success"
+            size="lg"
+            onClick={onNext}
+            iconRight={<PixelIcon name="arrow-right" size={22} tone="white" />}
+          >
+            NÄCHSTES LEVEL
+          </PixelButton>
+        )}
       </div>
     </div>
   );
