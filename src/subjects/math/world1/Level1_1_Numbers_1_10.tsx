@@ -4,6 +4,7 @@ import { audio } from '@engine/audio/AudioPlayer';
 import { getRandomEncourageKey, getRandomPraiseKey } from '@engine/audio/manifest';
 import { recordAttempt } from '@engine/progress/srs';
 import { useAppStore } from '@engine/state/store';
+import { shuffle } from '@engine/util/shuffle';
 import type { LevelProps, LevelResult } from '@subjects/types';
 
 /**
@@ -141,11 +142,15 @@ function generateTasks(count: number): CountTask[] {
     const answer = Math.floor(Math.random() * 9) + 2; // 2..10
     if (used.has(answer)) continue;
     used.add(answer);
-    const options = shuffle([
-      answer,
-      clamp(answer + (Math.random() > 0.5 ? 1 : -1), 1, 10),
-      clamp(answer + (Math.random() > 0.5 ? 2 : -2), 1, 10),
-    ]);
+
+    // Bilde 3 eindeutige Optionen mit der richtigen + 2 Distraktoren in der Nähe.
+    const distractorPool = new Set<number>();
+    while (distractorPool.size < 2) {
+      const offset = pickFrom([-2, -1, 1, 2]);
+      const candidate = clamp(answer + offset, 1, 10);
+      if (candidate !== answer) distractorPool.add(candidate);
+    }
+    const options = shuffle([answer, ...distractorPool]);
     tasks.push({ answer, options });
   }
   return tasks;
@@ -155,8 +160,6 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...new Set(arr)];
-  while (a.length < 3) a.push(Math.floor(Math.random() * 10) + 1 as unknown as T);
-  return a.sort(() => Math.random() - 0.5);
+function pickFrom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
 }

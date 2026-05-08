@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { audio } from '@engine/audio/AudioPlayer';
 import { useAppStore } from '@engine/state/store';
 import { recordAttempt } from '@engine/progress/srs';
+import { shuffle } from '@engine/util/shuffle';
 
 interface Props {
   onDone: () => void;
@@ -41,7 +42,13 @@ export default function OnboardingScreen({ onDone }: Props) {
     if (stage === 'intro') audio.play('onboarding/dragon_intro', { fallbackToTTS: true });
   }, [stage]);
 
-  const current = TASKS[taskIndex];
+  const baseTask = TASKS[taskIndex];
+  // Optionen pro Aufgabe einmalig shuffeln (stabil bis Aufgabe wechselt),
+  // damit die richtige Antwort nicht immer in der Mitte steht.
+  const current = useMemo(
+    () => (baseTask ? { ...baseTask, options: shuffle(baseTask.options) } : baseTask),
+    [baseTask],
+  );
 
   const handleAnswer = async (chosen: number) => {
     if (feedback) return;
