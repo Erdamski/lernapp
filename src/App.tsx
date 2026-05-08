@@ -1,32 +1,49 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ProfileSelect from '@ui/screens/ProfileSelect';
 import WorldMapScreen from '@ui/screens/WorldMapScreen';
 import OnboardingScreen from '@ui/screens/OnboardingScreen';
 import ParentGate from '@ui/screens/ParentGate';
 import ParentDashboard from '@ui/screens/ParentDashboard';
+import WelcomeOverlay from '@ui/components/WelcomeOverlay';
 import { useAppStore } from '@engine/state/store';
+import { audio } from '@engine/audio/AudioPlayer';
 
-type Screen = 'profile-select' | 'onboarding' | 'world-map' | 'parent-gate' | 'parent-dashboard';
+type Screen = 'profile-select' | 'welcome' | 'onboarding' | 'world-map' | 'parent-gate' | 'parent-dashboard';
 
 export default function App() {
   const { i18n } = useTranslation();
   const activeProfile = useAppStore((s) => s.activeProfile);
   const [screen, setScreen] = useState<Screen>('profile-select');
+  const lastProfileId = useRef<string | null>(null);
 
   useEffect(() => {
     if (activeProfile) {
       i18n.changeLanguage(activeProfile.language);
-      setScreen(activeProfile.onboardingDone ? 'world-map' : 'onboarding');
+      audio.setLanguage(activeProfile.language);
+      // Bei einem neu (oder neuerlich) ausgewählten Profil zuerst Welcome zeigen
+      if (lastProfileId.current !== activeProfile.id) {
+        lastProfileId.current = activeProfile.id;
+        setScreen('welcome');
+      }
     } else {
+      lastProfileId.current = null;
       setScreen('profile-select');
     }
   }, [activeProfile, i18n]);
+
+  const handleWelcomeDone = () => {
+    if (!activeProfile) return;
+    setScreen(activeProfile.onboardingDone ? 'world-map' : 'onboarding');
+  };
 
   return (
     <div className="w-screen h-screen overflow-hidden bg-gradient-to-b from-slate-900 to-indigo-950 text-white font-body">
       {screen === 'profile-select' && (
         <ProfileSelect onParentZone={() => setScreen('parent-gate')} />
+      )}
+      {screen === 'welcome' && activeProfile && (
+        <WelcomeOverlay profile={activeProfile} onDone={handleWelcomeDone} />
       )}
       {screen === 'onboarding' && <OnboardingScreen onDone={() => setScreen('world-map')} />}
       {screen === 'world-map' && <WorldMapScreen />}

@@ -29,8 +29,13 @@ if (!VOICE_ID) {
 }
 
 const args = process.argv.slice(2);
-const langArg = args[args.indexOf('--lang') + 1];
-const onlyArg = args[args.indexOf('--only') + 1];
+function getFlag(name: string): string | undefined {
+  const idx = args.indexOf(name);
+  if (idx === -1) return undefined;
+  return args[idx + 1];
+}
+const langArg = getFlag('--lang');
+const onlyArg = getFlag('--only');
 const force = args.includes('--force');
 
 interface VoiceSettings {

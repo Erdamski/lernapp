@@ -22,6 +22,40 @@ export const audioManifest: AudioManifest = {
     ru: 'Кто играет?',
   },
 
+  // Begrüßungen beim Profil-Anklicken (Variante 1–4 zufällig gemischt).
+  // Der Name wird visuell angezeigt; Audio bleibt namensunabhängig,
+  // damit wir die Dateien einmal pro Sprache generieren können.
+  'ui/welcome_back_1': {
+    de: 'Hi! Schön, dass du wieder da bist!',
+    en: 'Hi! Great to have you back!',
+    tr: 'Hey! Geri döndüğüne sevindim!',
+    ru: 'Привет! Рад, что ты вернулся!',
+  },
+  'ui/welcome_back_2': {
+    de: 'Hallo! Lass uns weitermachen!',
+    en: 'Hello! Let’s keep going!',
+    tr: 'Merhaba! Devam edelim!',
+    ru: 'Привет! Продолжим!',
+  },
+  'ui/welcome_back_3': {
+    de: 'Toll, dass du wieder spielst! Bist du bereit?',
+    en: 'Awesome, you’re back! Are you ready?',
+    tr: 'Tekrar oynamana sevindim! Hazır mısın?',
+    ru: 'Здорово, что ты снова играешь! Готов?',
+  },
+  'ui/welcome_back_4': {
+    de: 'Schön dich zu sehen! Heute wird es spannend!',
+    en: 'Nice to see you! Today is going to be exciting!',
+    tr: 'Seni gördüğüme sevindim! Bugün heyecanlı olacak!',
+    ru: 'Рад тебя видеть! Сегодня будет интересно!',
+  },
+  'ui/welcome_first': {
+    de: 'Willkommen! Lass uns dein Abenteuer starten!',
+    en: 'Welcome! Let’s start your adventure!',
+    tr: 'Hoş geldin! Maceran başlasın!',
+    ru: 'Добро пожаловать! Начнём твоё приключение!',
+  },
+
   // Onboarding
   'onboarding/dragon_intro': {
     de: 'Hallo Abenteurer! Ich bin der Drache und schaue mal, was du schon kannst. Keine Sorge, das ist kein Test, sondern ein Spiel!',
@@ -95,5 +129,10 @@ export function getRandomPraiseKey(): string {
 
 export function getRandomEncourageKey(): string {
   const variants = ['encourage/1', 'encourage/2'];
+  return variants[Math.floor(Math.random() * variants.length)];
+}
+
+export function getRandomWelcomeBackKey(): string {
+  const variants = ['ui/welcome_back_1', 'ui/welcome_back_2', 'ui/welcome_back_3', 'ui/welcome_back_4'];
   return variants[Math.floor(Math.random() * variants.length)];
 }

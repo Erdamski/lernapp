@@ -1,0 +1,63 @@
+import { useEffect, useState } from 'react';
+import { audio } from '@engine/audio/AudioPlayer';
+import { getRandomWelcomeBackKey } from '@engine/audio/manifest';
+import PixelCharacter from './PixelCharacter';
+import type { Profile } from '@engine/db/schema';
+
+interface Props {
+  profile: Profile;
+  onDone: () => void;
+}
+
+/**
+ * Begrüßungs-Overlay: zeigt nach Profil-Auswahl Avatar + Name groß an
+ * und spielt eine zufällige Audio-Begrüßung in der Profil-Sprache.
+ * Dismissed sich nach ~2.5s automatisch oder beim Antippen.
+ */
+export default function WelcomeOverlay({ profile, onDone }: Props) {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const key = profile.onboardingDone ? getRandomWelcomeBackKey() : 'ui/welcome_first';
+    audio.setLanguage(profile.language);
+    audio.play(key, { fallbackToTTS: true, lang: profile.language });
+
+    // Bei TTS-Fallback (kein Audio-File da) — Name danach noch sprechen
+    const timer = window.setTimeout(() => {
+      audio.speak(profile.name, profile.language);
+    }, 600);
+
+    const closeTimer = window.setTimeout(() => {
+      setVisible(false);
+      window.setTimeout(onDone, 300);
+    }, 2800);
+
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(closeTimer);
+    };
+  }, [profile, onDone]);
+
+  return (
+    <div
+      onClick={() => {
+        setVisible(false);
+        setTimeout(onDone, 200);
+      }}
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-indigo-950 to-slate-900 transition-opacity duration-300 ${
+        visible ? 'opacity-100' : 'opacity-0'
+      }`}
+    >
+      <div className="animate-pop">
+        <PixelCharacter config={profile.character} size={260} bg={null} />
+      </div>
+      <div className="mt-6 text-7xl font-display animate-pop" style={{ animationDelay: '120ms' }}>
+        Hi, {profile.name}!
+      </div>
+      <div className="mt-4 text-2xl text-white/70 animate-pop" style={{ animationDelay: '240ms' }}>
+        {profile.onboardingDone ? 'Schön, dass du wieder da bist!' : 'Lass uns dein Abenteuer starten!'}
+      </div>
+      <div className="mt-8 text-sm text-white/40">tippen zum Weiter</div>
+    </div>
+  );
+}

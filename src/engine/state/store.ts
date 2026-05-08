@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { db, type Profile } from '@engine/db/schema';
+import { generateId } from '@engine/util/id';
 
 interface AppState {
   profiles: Profile[];
@@ -41,7 +42,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   createProfile: async (data) => {
     const profile: Profile = {
       ...data,
-      id: crypto.randomUUID(),
+      id: generateId(),
       createdAt: Date.now(),
       coins: 0,
       totalStars: 0,
