@@ -39,7 +39,12 @@ export default function App() {
   };
 
   // Theme-Wahl für Hintergrund je nach Screen
-  const bgTheme = screen === 'world-map' || screen === 'onboarding' ? 'math' : 'world';
+  const bgTheme: 'math' | 'world' | 'sky' =
+    screen === 'world-map' || screen === 'onboarding'
+      ? 'math'
+      : screen === 'profile-select'
+        ? 'sky'
+        : 'world';
 
   return (
     <div className="w-screen h-screen overflow-hidden text-white font-body relative">
