@@ -19,13 +19,21 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeProfile: null,
 
   loadProfiles: async () => {
-    const profiles = await db.profiles.orderBy('createdAt').toArray();
-    set({ profiles });
+    try {
+      const profiles = await db.profiles.orderBy('createdAt').toArray();
+      set({ profiles });
+    } catch (err) {
+      console.error('[loadProfiles]', err);
+    }
   },
 
   selectProfile: async (id) => {
-    const profile = await db.profiles.get(id);
-    if (profile) set({ activeProfile: profile });
+    try {
+      const profile = await db.profiles.get(id);
+      if (profile) set({ activeProfile: profile });
+    } catch (err) {
+      console.error('[selectProfile]', err);
+    }
   },
 
   logoutProfile: () => set({ activeProfile: null }),
@@ -39,8 +47,14 @@ export const useAppStore = create<AppState>((set, get) => ({
       totalStars: 0,
       onboardingDone: false,
     };
-    await db.profiles.put(profile);
+    try {
+      await db.profiles.put(profile);
+    } catch (err) {
+      console.error('[createProfile] db.put failed', err);
+      throw err;
+    }
     await get().loadProfiles();
+    set({ activeProfile: profile });
     return profile;
   },
 

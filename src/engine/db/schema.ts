@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie';
 import type { SupportedLanguage } from '@i18n/init';
+import type { CharacterConfig } from '@engine/avatar/character';
 
 export interface Profile {
   id: string;
@@ -7,18 +8,11 @@ export interface Profile {
   age: number;
   language: SupportedLanguage;
   pin?: string;
-  avatar: AvatarConfig;
+  character: CharacterConfig;
   createdAt: number;
   onboardingDone: boolean;
   coins: number;
   totalStars: number;
-}
-
-export interface AvatarConfig {
-  baseColor: string;
-  outfitId: string;
-  hatId: string;
-  toolId: string;
 }
 
 export interface ProgressEntry {
@@ -82,6 +76,31 @@ export class LernappDB extends Dexie {
       settings: 'id',
       sessions: '++id, profileId, startedAt',
     });
+    // v2: Avatar-Schema von items zu pixel-character migriert.
+    this.version(2)
+      .stores({
+        profiles: 'id, name, createdAt',
+        progress: '++id, [profileId+subject+worldId+levelId], profileId, lastPlayedAt',
+        srs: '++id, [profileId+subject+taskKey], profileId, nextDue',
+        settings: 'id',
+        sessions: '++id, profileId, startedAt',
+      })
+      .upgrade(async (tx) => {
+        // Alte Profile mit veraltetem `avatar`-Feld auf neues `character` umstellen
+        await tx.table('profiles').toCollection().modify((p: Record<string, unknown>) => {
+          if (!p.character) {
+            p.character = {
+              presetId: 'boy_1',
+              skinId: 'tan',
+              hairId: 'short',
+              hairColorId: 'brown',
+              topId: 'tshirt_red',
+              bottomId: 'pants_blue',
+            };
+          }
+          delete p.avatar;
+        });
+      });
   }
 }
 

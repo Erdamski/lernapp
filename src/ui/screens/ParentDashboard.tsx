@@ -68,7 +68,7 @@ export default function ParentDashboard({ onExit }: Props) {
                 selected?.id === p.id ? 'bg-primary-500/30 ring-2 ring-primary-300' : 'bg-white/5'
               }`}
             >
-              <AvatarSprite config={p.avatar} size={70} />
+              <AvatarSprite config={p.character} size={70} />
               <div className="font-display">{p.name}</div>
               <div className="text-xs text-white/60">⭐ {p.totalStars} · 🪙 {p.coins}</div>
             </button>
