@@ -60,12 +60,23 @@ export interface PlaySession {
   coinsEarned: number;
 }
 
+export interface CachedAudio {
+  id: string;            // z. B. `welcome:${profileId}`
+  profileId: string;
+  kind: string;          // 'welcome', 'level-intro', etc.
+  text: string;          // Originaltext, zur Cache-Invalidierung bei Namensänderung
+  blob: Blob;
+  language: string;
+  createdAt: number;
+}
+
 export class LernappDB extends Dexie {
   profiles!: Table<Profile, string>;
   progress!: Table<ProgressEntry, number>;
   srs!: Table<SrsItem, number>;
   settings!: Table<Settings, string>;
   sessions!: Table<PlaySession, number>;
+  audioCache!: Table<CachedAudio, string>;
 
   constructor() {
     super('lernapp');
@@ -84,6 +95,7 @@ export class LernappDB extends Dexie {
         srs: '++id, [profileId+subject+taskKey], profileId, nextDue',
         settings: 'id',
         sessions: '++id, profileId, startedAt',
+        audioCache: 'id, profileId, kind',
       })
       .upgrade(async (tx) => {
         // Alte Profile mit veraltetem `avatar`-Feld auf neues `character` umstellen

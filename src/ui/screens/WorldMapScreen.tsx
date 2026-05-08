@@ -5,7 +5,8 @@ import { SUBJECTS } from '@subjects/index';
 import type { LevelDefinition, LevelResult, WorldDefinition } from '@subjects/types';
 import { audio } from '@engine/audio/AudioPlayer';
 import { recordLevelResult, getWorldProgress } from '@engine/progress/levels';
-import AvatarShop from './AvatarShop';
+import CharacterWizard from './CharacterWizard';
+import { db } from '@engine/db/schema';
 import PixelButton from '@ui/components/PixelButton';
 import PixelIcon from '@ui/components/PixelIcon';
 import PixelTitle from '@ui/components/PixelTitle';
@@ -187,7 +188,18 @@ export default function WorldMapScreen() {
   }
 
   if (view === 'shop') {
-    return <AvatarShop onClose={() => setView('islands')} />;
+    return (
+      <CharacterWizard
+        mode="edit"
+        initialCharacter={profile.character}
+        onCancel={() => setView('islands')}
+        onSubmit={async (character) => {
+          await db.profiles.put({ ...profile, character });
+          await refresh();
+          setView('islands');
+        }}
+      />
+    );
   }
 
   return null;

@@ -64,6 +64,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     await db.progress.where('profileId').equals(id).delete();
     await db.srs.where('profileId').equals(id).delete();
     await db.sessions.where('profileId').equals(id).delete();
+    await db.audioCache.where('profileId').equals(id).delete();
     await get().loadProfiles();
     if (get().activeProfile?.id === id) set({ activeProfile: null });
   },
