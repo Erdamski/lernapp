@@ -118,7 +118,6 @@ export default function WorldMapScreen() {
             levels={activeWorld.levels}
             progress={progress}
             character={profile.character}
-            theme="math"
             onLevelTap={(level) => {
               setActiveLevel(level);
               setView('level');

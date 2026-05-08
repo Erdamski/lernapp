@@ -9,7 +9,8 @@ import PixelIcon from '@ui/components/PixelIcon';
 import PixelTitle from '@ui/components/PixelTitle';
 import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
-import { BlockRow, MathBlocks } from '@ui/components/CountBlocks';
+import { MathBlocks } from '@ui/components/CountBlocks';
+import PixelItem, { COUNT_ITEMS_POOL, ITEM_LABELS_DE, type CountItemKind } from '@ui/components/PixelItem';
 
 interface Props {
   onDone: () => void;
@@ -17,6 +18,7 @@ interface Props {
 
 interface DiagTask {
   id: string;
+  /** Visual: 'item:N' für Zähl-Aufgaben (item = key aus PixelItem), 'a+b' / 'a-b' für Mathe */
   prompt: string;
   question: string;
   options: number[];
@@ -24,16 +26,32 @@ interface DiagTask {
   difficulty: 1 | 2 | 3 | 4 | 5;
 }
 
-const TASKS: DiagTask[] = [
-  { id: 'count_3', prompt: 'apple:3', question: 'Wie viele Äpfel?', options: [2, 3, 4], answer: 3, difficulty: 1 },
-  { id: 'count_5', prompt: 'star:5', question: 'Wie viele Sterne?', options: [4, 5, 6], answer: 5, difficulty: 1 },
-  { id: 'count_7', prompt: 'apple:7', question: 'Wie viele Äpfel?', options: [6, 7, 8], answer: 7, difficulty: 2 },
-  { id: 'add_2_3', prompt: '2+3', question: '2 + 3 = ?', options: [4, 5, 6], answer: 5, difficulty: 2 },
-  { id: 'add_4_5', prompt: '4+5', question: 'Wie viel ist das?', options: [8, 9, 10], answer: 9, difficulty: 3 },
-  { id: 'sub_8_3', prompt: '8-3', question: 'Wie viel bleibt?', options: [4, 5, 6], answer: 5, difficulty: 3 },
-  { id: 'add_zo_7_5', prompt: '7+5', question: 'Wie viel ist das?', options: [11, 12, 13], answer: 12, difficulty: 4 },
-  { id: 'sub_zo_13_5', prompt: '13-5', question: 'Wie viel bleibt?', options: [7, 8, 9], answer: 8, difficulty: 5 },
-];
+// Onboarding-Aufgaben: zufällig variierende Items, sodass Frage-Text und gezeigtes
+// Bild stets übereinstimmen.
+function buildOnboardingTasks(): DiagTask[] {
+  const pickItem = () => COUNT_ITEMS_POOL[Math.floor(Math.random() * COUNT_ITEMS_POOL.length)];
+  const counting = (count: number, difficulty: 1 | 2): DiagTask => {
+    const item = pickItem();
+    return {
+      id: `count_${count}_${item}`,
+      prompt: `${item}:${count}`,
+      question: `Wie viele ${ITEM_LABELS_DE[item].pl} siehst du?`,
+      options: [count - 1, count, count + 1].filter((n) => n >= 0),
+      answer: count,
+      difficulty,
+    };
+  };
+  return [
+    counting(3, 1),
+    counting(5, 1),
+    counting(7, 2),
+    { id: 'add_2_3', prompt: '2+3', question: 'Wie viel ist 2 + 3?', options: [4, 5, 6], answer: 5, difficulty: 2 },
+    { id: 'add_4_5', prompt: '4+5', question: 'Wie viel ist 4 + 5?', options: [8, 9, 10], answer: 9, difficulty: 3 },
+    { id: 'sub_8_3', prompt: '8-3', question: 'Wie viel bleibt von 8 minus 3?', options: [4, 5, 6], answer: 5, difficulty: 3 },
+    { id: 'add_zo_7_5', prompt: '7+5', question: 'Wie viel ist 7 + 5?', options: [11, 12, 13], answer: 12, difficulty: 4 },
+    { id: 'sub_zo_13_5', prompt: '13-5', question: 'Wie viel bleibt von 13 minus 5?', options: [7, 8, 9], answer: 8, difficulty: 5 },
+  ];
+}
 
 export default function OnboardingScreen({ onDone }: Props) {
   const { t } = useTranslation();
@@ -48,6 +66,7 @@ export default function OnboardingScreen({ onDone }: Props) {
     if (stage === 'intro') audio.play('onboarding/dragon_intro', { fallbackToTTS: true });
   }, [stage]);
 
+  const TASKS = useMemo(() => buildOnboardingTasks(), []);
   const baseTask = TASKS[taskIndex];
   const current = useMemo(
     () => (baseTask ? { ...baseTask, options: shuffle(baseTask.options) } : baseTask),
@@ -154,23 +173,20 @@ export default function OnboardingScreen({ onDone }: Props) {
 }
 
 function PromptDisplay({ prompt }: { prompt: string }) {
-  // Format: "apple:N", "star:N" → echte Pixel-Icons (kein Block)
+  // Format: "<itemKind>:N" → Pixel-Icon des passenden Items
   if (prompt.includes(':')) {
     const [type, n] = prompt.split(':');
     const count = parseInt(n);
-    if (type === 'apple' || type === 'star') {
-      const size = count <= 4 ? 96 : count <= 6 ? 80 : count <= 8 ? 68 : 56;
-      return (
-        <div className="flex flex-row items-center justify-center gap-3 max-w-full">
-          {Array.from({ length: count }).map((_, i) => (
-            <div key={i} className="animate-pop shrink-0" style={{ animationDelay: `${i * 40}ms` }}>
-              <PixelIcon name={type as 'apple' | 'star'} size={size} />
-            </div>
-          ))}
-        </div>
-      );
-    }
-    return <BlockRow count={count} color="blue" />;
+    const size = count <= 4 ? 96 : count <= 6 ? 80 : count <= 8 ? 68 : 56;
+    return (
+      <div className="flex flex-row items-center justify-center gap-3 max-w-full">
+        {Array.from({ length: count }).map((_, i) => (
+          <div key={i} className="animate-pop shrink-0" style={{ animationDelay: `${i * 40}ms` }}>
+            <PixelItem kind={type as CountItemKind} size={size} />
+          </div>
+        ))}
+      </div>
+    );
   }
   // Math expressions: 2+3 → 2 blaue + 3 grüne Blöcke (zum Zusammenzählen)
   const m = prompt.match(/^(\d+)\s*([+\-])\s*(\d+)$/);
