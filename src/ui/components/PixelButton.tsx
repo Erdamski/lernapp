@@ -1,4 +1,5 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, MouseEvent, ReactNode } from 'react';
+import { sfx } from '@engine/audio/SoundPlayer';
 
 type Variant = 'primary' | 'success' | 'danger' | 'coin' | 'magic' | 'ghost';
 type Size = 'sm' | 'md' | 'lg' | 'icon';
@@ -35,9 +36,15 @@ export default function PixelButton({
 
   const v = VARIANTS[variant];
 
+  const onClick = (e: MouseEvent<HTMLButtonElement>) => {
+    sfx.buttonTap();
+    rest.onClick?.(e);
+  };
+
   return (
     <button
       {...rest}
+      onClick={onClick}
       className={[
         'pixel-btn',
         size !== 'icon' ? 'pixel-btn-glossy' : '',

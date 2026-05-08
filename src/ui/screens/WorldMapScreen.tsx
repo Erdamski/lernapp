@@ -4,6 +4,7 @@ import { useAppStore } from '@engine/state/store';
 import { SUBJECTS } from '@subjects/index';
 import type { LevelDefinition, LevelResult, WorldDefinition } from '@subjects/types';
 import { audio } from '@engine/audio/AudioPlayer';
+import { sfx } from '@engine/audio/SoundPlayer';
 import { recordLevelResult, getWorldProgress } from '@engine/progress/levels';
 import CharacterWizard from './CharacterWizard';
 import { db } from '@engine/db/schema';
@@ -44,6 +45,8 @@ export default function WorldMapScreen() {
     await addCoins(coinsEarned);
     await refresh();
     setLastResult(result);
+    if (result.stars >= 1) sfx.levelUp();
+    sfx.coin();
     setView('level-result');
   };
 
@@ -138,35 +141,9 @@ export default function WorldMapScreen() {
 
   if (view === 'level-result' && lastResult) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
-        <div className="mb-6 animate-pop">
-          <PixelIcon name="trophy" size={140} />
-        </div>
-        <PixelTitle size="lg" color="gold" className="mb-3">
-          {lastResult.stars >= 1 ? 'GESCHAFFT!' : 'WEITER GEHT\'S!'}
-        </PixelTitle>
-        <div className="flex gap-3 my-6">
-          {[1, 2, 3].map((s) => (
-            <div key={s} className={lastResult.stars >= s ? 'animate-pop' : ''} style={{ animationDelay: `${s * 100}ms` }}>
-              <PixelIcon name={lastResult.stars >= s ? 'star' : 'star-empty'} size={72} />
-            </div>
-          ))}
-        </div>
-        <p className="text-xl font-body text-white/70 mb-2">
-          {lastResult.correct} von {lastResult.total} richtig
-        </p>
-        <div className="flex items-center gap-2 mb-8">
-          <PixelIcon name="coin" size={28} />
-          <span className="font-pixel text-[20px] text-accent-coin">+{lastResult.stars * 10 + lastResult.correct * 2}</span>
-        </div>
-        <div className="flex gap-3">
-          <PixelButton variant="ghost" size="md" onClick={() => setView('world')}>Welt</PixelButton>
-          <PixelButton variant="primary" size="md" onClick={() => setView('level')}>Nochmal</PixelButton>
-        </div>
-      </div>
+      <LevelResultScreen result={lastResult} onWorld={() => setView('world')} onAgain={() => setView('level')} />
     );
   }
-
   if (view === 'shop') {
     return (
       <CharacterWizard
@@ -183,6 +160,47 @@ export default function WorldMapScreen() {
   }
 
   return null;
+}
+
+/**
+ * Level-Ergebnis-Screen mit gestaffelter Stern-Animation und Sound-Sequenz.
+ */
+function LevelResultScreen({ result, onWorld, onAgain }: { result: LevelResult; onWorld: () => void; onAgain: () => void }) {
+  useEffect(() => {
+    // Sterne nacheinander mit Sound enthüllen
+    for (let i = 0; i < result.stars; i++) {
+      window.setTimeout(() => sfx.star(), 200 + i * 350);
+    }
+  }, [result.stars]);
+
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
+      <div className="mb-6 animate-pop">
+        <PixelIcon name="trophy" size={140} />
+      </div>
+      <PixelTitle size="lg" color="gold" className="mb-3">
+        {result.stars >= 1 ? 'GESCHAFFT!' : "WEITER GEHT'S!"}
+      </PixelTitle>
+      <div className="flex gap-3 my-6">
+        {[1, 2, 3].map((s) => (
+          <div key={s} className={result.stars >= s ? 'animate-pop' : ''} style={{ animationDelay: `${s * 350}ms` }}>
+            <PixelIcon name={result.stars >= s ? 'star' : 'star-empty'} size={72} />
+          </div>
+        ))}
+      </div>
+      <p className="text-xl font-body text-white/70 mb-2">
+        {result.correct} von {result.total} richtig
+      </p>
+      <div className="flex items-center gap-2 mb-8">
+        <PixelIcon name="coin" size={28} />
+        <span className="font-pixel text-[20px] text-accent-coin">+{result.stars * 10 + result.correct * 2}</span>
+      </div>
+      <div className="flex gap-3">
+        <PixelButton variant="ghost" size="md" onClick={onWorld}>Welt</PixelButton>
+        <PixelButton variant="primary" size="md" onClick={onAgain}>Nochmal</PixelButton>
+      </div>
+    </div>
+  );
 }
 
 function SubjectIcon({ id }: { id: string }) {

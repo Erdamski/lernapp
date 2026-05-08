@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { audio } from '@engine/audio/AudioPlayer';
+import { sfx } from '@engine/audio/SoundPlayer';
 import { getOrGenerateWelcomeAudio, welcomeText } from '@engine/audio/elevenLabsClient';
 import PixelCharacter from './PixelCharacter';
 import PixelTitle from './PixelTitle';
@@ -24,6 +25,7 @@ export default function WelcomeOverlay({ profile, onDone }: Props) {
   useEffect(() => {
     let cancelled = false;
     audio.setLanguage(profile.language);
+    sfx.celebrate();
 
     const playPersonalized = async () => {
       const text = welcomeText(profile.name, profile.language, profile.onboardingDone);

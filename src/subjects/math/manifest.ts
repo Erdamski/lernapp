@@ -5,6 +5,8 @@ import Level1_3 from './world1/Level1_3_Plus_10';
 import Level1_4 from './world1/Level1_4_Minus_10';
 import Level1_5 from './world1/Level1_5_Numbers_to_20';
 import Level1_6 from './world1/Level1_6_PlusMinus_to_20';
+import Level1_7 from './world1/Level1_7_Crossing_10';
+import Level1_8 from './world1/Level1_8_Shapes_Money_Time';
 
 /**
  * Mathematik – Fach-Definition nach Berliner Rahmenlehrplan.
@@ -70,6 +72,20 @@ export const mathSubject: SubjectDefinition = {
           labelKey: 'math.level_1_6_label',
           topicKey: 'plusminus_to_20',
           component: Level1_6,
+          taskCount: 5,
+        },
+        {
+          id: 'level-1-7',
+          labelKey: 'math.level_1_7_label',
+          topicKey: 'crossing_10',
+          component: Level1_7,
+          taskCount: 5,
+        },
+        {
+          id: 'level-1-8',
+          labelKey: 'math.level_1_8_label',
+          topicKey: 'shapes_money_time',
+          component: Level1_8,
           taskCount: 5,
         },
       ],

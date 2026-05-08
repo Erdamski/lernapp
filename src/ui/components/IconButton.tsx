@@ -1,4 +1,5 @@
-import { memo, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { memo, type ButtonHTMLAttributes, type MouseEvent, type ReactNode } from 'react';
+import { sfx } from '@engine/audio/SoundPlayer';
 
 interface Props extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   children: ReactNode;
@@ -18,9 +19,14 @@ export default memo(function IconButton({
   ...rest
 }: Props) {
   const v = STYLES[variant];
+  const onClick = (e: MouseEvent<HTMLButtonElement>) => {
+    sfx.buttonTap();
+    rest.onClick?.(e);
+  };
   return (
     <button
       {...rest}
+      onClick={onClick}
       style={{ width: size, height: size, ...rest.style }}
       className={`pixel-btn ${v.bg} ${v.shadow} shadow-pixel-sm border-0 p-0 flex items-center justify-center ${className}`}
     >

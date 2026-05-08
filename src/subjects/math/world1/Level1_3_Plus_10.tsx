@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { audio } from '@engine/audio/AudioPlayer';
+import { sfx } from '@engine/audio/SoundPlayer';
 import { getRandomEncourageKey, getRandomPraiseKey } from '@engine/audio/manifest';
 import { recordAttempt } from '@engine/progress/srs';
 import { useAppStore } from '@engine/state/store';
@@ -52,9 +53,11 @@ export default function Level1_3_Plus_10({ onComplete, onExit }: LevelProps) {
     if (isCorrect) {
       correctRef.current += 1;
       setFeedback('correct');
+      sfx.correct();
       audio.play(getRandomPraiseKey(), { fallbackToTTS: true });
     } else {
       setFeedback('wrong');
+      sfx.wrong();
       audio.play(getRandomEncourageKey(), { fallbackToTTS: true });
     }
 
