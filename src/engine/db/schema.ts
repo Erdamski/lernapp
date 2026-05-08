@@ -112,3 +112,20 @@ export class LernappDB extends Dexie {
 }
 
 export const db = new LernappDB();
+
+/**
+ * Defensive Initialisierung: Falls die IndexedDB in einem inkompatiblen Zustand ist
+ * (z. B. höhere Versionsnummer aus früherem Code-Stand), löschen und neu anlegen.
+ * Das verhindert Blank-Screen-Probleme bei Schema-Rollback.
+ */
+db.open().catch(async (err) => {
+  console.warn('[db] open failed, resetting database', err);
+  try {
+    db.close();
+    await Dexie.delete('lernapp');
+    await db.open();
+    console.info('[db] reset successful');
+  } catch (e) {
+    console.error('[db] reset failed', e);
+  }
+});
