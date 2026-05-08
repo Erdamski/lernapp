@@ -1,7 +1,10 @@
 import type { SubjectDefinition } from '@subjects/types';
 import Level1_1 from './world1/Level1_1_Numbers_1_10';
+import Level1_2 from './world1/Level1_2_Decomposition';
 import Level1_3 from './world1/Level1_3_Plus_10';
 import Level1_4 from './world1/Level1_4_Minus_10';
+import Level1_5 from './world1/Level1_5_Numbers_to_20';
+import Level1_6 from './world1/Level1_6_PlusMinus_to_20';
 
 /**
  * Mathematik – Fach-Definition nach Berliner Rahmenlehrplan.
@@ -35,6 +38,13 @@ export const mathSubject: SubjectDefinition = {
           taskCount: 5,
         },
         {
+          id: 'level-1-2',
+          labelKey: 'math.level_1_2_label',
+          topicKey: 'decomposition',
+          component: Level1_2,
+          taskCount: 5,
+        },
+        {
           id: 'level-1-3',
           labelKey: 'math.level_1_3_label',
           topicKey: 'add_zr10',
@@ -46,6 +56,20 @@ export const mathSubject: SubjectDefinition = {
           labelKey: 'math.level_1_4_label',
           topicKey: 'sub_zr10',
           component: Level1_4,
+          taskCount: 5,
+        },
+        {
+          id: 'level-1-5',
+          labelKey: 'math.level_1_5_label',
+          topicKey: 'numbers_to_20',
+          component: Level1_5,
+          taskCount: 5,
+        },
+        {
+          id: 'level-1-6',
+          labelKey: 'math.level_1_6_label',
+          topicKey: 'plusminus_to_20',
+          component: Level1_6,
           taskCount: 5,
         },
       ],
