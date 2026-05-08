@@ -108,6 +108,25 @@ export class LernappDB extends Dexie {
           delete p.avatar;
         });
       });
+    // v3+v4: Reservierte Versionen für bereits offene DBs (no-op upgrades).
+    // Verhindert VersionError wenn Browser-DB durch frühere Code-Stände
+    // bereits auf höherer Version war.
+    this.version(3).stores({
+      profiles: 'id, name, createdAt',
+      progress: '++id, [profileId+subject+worldId+levelId], profileId, lastPlayedAt',
+      srs: '++id, [profileId+subject+taskKey], profileId, nextDue',
+      settings: 'id',
+      sessions: '++id, profileId, startedAt',
+      audioCache: 'id, profileId, kind',
+    });
+    this.version(4).stores({
+      profiles: 'id, name, createdAt',
+      progress: '++id, [profileId+subject+worldId+levelId], profileId, lastPlayedAt',
+      srs: '++id, [profileId+subject+taskKey], profileId, nextDue',
+      settings: 'id',
+      sessions: '++id, profileId, startedAt',
+      audioCache: 'id, profileId, kind',
+    });
   }
 }
 
