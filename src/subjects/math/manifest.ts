@@ -1,5 +1,7 @@
 import type { SubjectDefinition } from '@subjects/types';
 import Level1_1 from './world1/Level1_1_Numbers_1_10';
+import Level1_3 from './world1/Level1_3_Plus_10';
+import Level1_4 from './world1/Level1_4_Minus_10';
 
 /**
  * Mathematik – Fach-Definition nach Berliner Rahmenlehrplan.
@@ -32,9 +34,20 @@ export const mathSubject: SubjectDefinition = {
           component: Level1_1,
           taskCount: 5,
         },
-        // Platzhalter – kommen in Phase 2/3
-        // { id: 'level-1-2', labelKey: 'math.level_1_2_label', topicKey: 'decomposition', component: ..., taskCount: 6 },
-        // { id: 'level-1-3', labelKey: 'math.level_1_3_label', topicKey: 'add_zr10', component: ..., taskCount: 8 },
+        {
+          id: 'level-1-3',
+          labelKey: 'math.level_1_3_label',
+          topicKey: 'add_zr10',
+          component: Level1_3,
+          taskCount: 5,
+        },
+        {
+          id: 'level-1-4',
+          labelKey: 'math.level_1_4_label',
+          topicKey: 'sub_zr10',
+          component: Level1_4,
+          taskCount: 5,
+        },
       ],
     },
   ],

@@ -7,6 +7,7 @@ import { shuffle } from '@engine/util/shuffle';
 import PixelButton from '@ui/components/PixelButton';
 import PixelIcon from '@ui/components/PixelIcon';
 import PixelTitle from '@ui/components/PixelTitle';
+import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
 import { BlockRow, MathBlocks } from '@ui/components/CountBlocks';
 
@@ -116,18 +117,10 @@ export default function OnboardingScreen({ onDone }: Props) {
     <div className="w-full h-full flex flex-col items-center p-6">
       <header className="w-full flex items-center justify-between max-w-4xl mb-2">
         <span className="font-pixel text-[16px] text-white/70">{taskIndex + 1} / {TASKS.length}</span>
-        <button
-          onClick={() => current && audio.speak(current.question)}
-          className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0"
-          aria-label="Vorlesen"
-        >
+        <IconButton onClick={() => current && audio.speak(current.question)} aria-label="Vorlesen">
           <PixelIcon name="speaker" size={26} tone="white" />
-        </button>
+        </IconButton>
       </header>
-
-      {profile && (
-        <ProgressRoute totalSteps={TASKS.length + 1} currentStep={routeStep} character={profile.character} lastResult={feedback} />
-      )}
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
         <div className="text-4xl sm:text-5xl font-body font-bold text-white/90 text-center">{current?.question}</div>
@@ -152,6 +145,10 @@ export default function OnboardingScreen({ onDone }: Props) {
           })}
         </div>
       </div>
+
+      {profile && (
+        <ProgressRoute totalSteps={TASKS.length + 1} currentStep={routeStep} character={profile.character} lastResult={feedback} />
+      )}
     </div>
   );
 }

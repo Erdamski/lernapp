@@ -78,20 +78,25 @@ export const audioManifest: AudioManifest = {
     ru: 'Добро пожаловать в Страну Чисел! Здесь ты научишься считать до двадцати.',
   },
   'math/level_1_1_intro': {
-    de: 'Lass uns die Zahlen von eins bis zehn kennenlernen. Zähle die Äpfel und tippe auf die richtige Zahl!',
-    en: 'Let’s get to know the numbers from one to ten. Count the apples and tap the right number!',
-    tr: 'Birden ona kadar sayıları öğrenelim. Elmaları say ve doğru sayıya dokun!',
-    ru: 'Давай познакомимся с числами от одного до десяти. Посчитай яблоки и нажми на правильное число!',
+    de: 'Lass uns die Zahlen von eins bis zehn lernen. Zähle die Bilder und tippe auf die richtige Zahl!',
+    en: 'Let’s learn the numbers from one to ten. Count the items and tap the right number!',
+    tr: 'Birden ona kadar sayıları öğrenelim. Resimleri say ve doğru sayıya dokun!',
+    ru: 'Давай выучим числа от одного до десяти. Посчитай предметы и нажми на правильное число!',
   },
 
-  // Lobsprüche (5 Varianten)
+  // Lobsprüche (10 Varianten – zufällig gemischt für mehr Abwechslung)
   'praise/1': { de: 'Super!', en: 'Super!', tr: 'Süper!', ru: 'Супер!' },
   'praise/2': { de: 'Toll gemacht!', en: 'Well done!', tr: 'Aferin!', ru: 'Отлично!' },
   'praise/3': { de: 'Genau richtig!', en: 'Exactly right!', tr: 'Tam isabet!', ru: 'В точку!' },
   'praise/4': { de: 'Du bist klasse!', en: 'You rock!', tr: 'Harikasın!', ru: 'Ты молодец!' },
   'praise/5': { de: 'Weiter so!', en: 'Keep it up!', tr: 'Böyle devam!', ru: 'Так держать!' },
+  'praise/6': { de: 'Wow, das war schnell!', en: 'Wow, that was quick!', tr: 'Vay, çok hızlıydın!', ru: 'Ого, как быстро!' },
+  'praise/7': { de: 'Mathe-Profi!', en: 'Math pro!', tr: 'Matematik ustası!', ru: 'Математический профи!' },
+  'praise/8': { de: 'Du bist auf dem richtigen Weg!', en: 'You’re on the right track!', tr: 'Doğru yoldasın!', ru: 'Ты на правильном пути!' },
+  'praise/9': { de: 'Klasse Idee!', en: 'Great thinking!', tr: 'Harika düşünce!', ru: 'Отличная мысль!' },
+  'praise/10': { de: 'Stark gemacht!', en: 'Awesome work!', tr: 'Çok güzel iş!', ru: 'Великолепно!' },
 
-  // Ermutigung bei Fehler
+  // Ermutigung bei Fehler (8 Varianten)
   'encourage/1': {
     de: 'Probier es nochmal, du schaffst das!',
     en: 'Try again, you can do it!',
@@ -103,6 +108,42 @@ export const audioManifest: AudioManifest = {
     en: 'No problem, everyone learns at their own pace.',
     tr: 'Sorun yok, herkes kendi hızında öğrenir.',
     ru: 'Ничего страшного, каждый учится в своём темпе.',
+  },
+  'encourage/3': {
+    de: 'Fast! Schau noch mal genau hin.',
+    en: 'Almost! Take another look.',
+    tr: 'Az kaldı! Bir daha bak bakalım.',
+    ru: 'Почти! Посмотри ещё раз.',
+  },
+  'encourage/4': {
+    de: 'Üben hilft. Lass es uns nochmal versuchen.',
+    en: 'Practice helps. Let’s try again.',
+    tr: 'Alıştırma yardım eder. Hadi yeniden deneyelim.',
+    ru: 'Тренировка помогает. Давай ещё раз.',
+  },
+  'encourage/5': {
+    de: 'Beim nächsten Mal klappt es bestimmt!',
+    en: 'You’ll get it next time!',
+    tr: 'Bir dahaki sefere kesin olur!',
+    ru: 'В следующий раз обязательно получится!',
+  },
+  'encourage/6': {
+    de: 'Tief durchatmen, du kannst das.',
+    en: 'Take a deep breath, you got this.',
+    tr: 'Derin nefes al, başarabilirsin.',
+    ru: 'Сделай глубокий вдох, у тебя получится.',
+  },
+  'encourage/7': {
+    de: 'Kleine Fehler gehören dazu.',
+    en: 'Little mistakes are part of learning.',
+    tr: 'Küçük hatalar öğrenmenin parçasıdır.',
+    ru: 'Маленькие ошибки — часть учёбы.',
+  },
+  'encourage/8': {
+    de: 'Schau dir die Aufgabe nochmal an.',
+    en: 'Have another look at the task.',
+    tr: 'Soruya bir daha bak.',
+    ru: 'Посмотри ещё раз на задание.',
   },
 
   // Zahlen 1–10 vorlesen
@@ -123,13 +164,13 @@ export const audioManifest: AudioManifest = {
 };
 
 export function getRandomPraiseKey(): string {
-  const variants = ['praise/1', 'praise/2', 'praise/3', 'praise/4', 'praise/5'];
-  return variants[Math.floor(Math.random() * variants.length)];
+  const n = 10;
+  return `praise/${1 + Math.floor(Math.random() * n)}`;
 }
 
 export function getRandomEncourageKey(): string {
-  const variants = ['encourage/1', 'encourage/2'];
-  return variants[Math.floor(Math.random() * variants.length)];
+  const n = 8;
+  return `encourage/${1 + Math.floor(Math.random() * n)}`;
 }
 
 export function getRandomWelcomeBackKey(): string {

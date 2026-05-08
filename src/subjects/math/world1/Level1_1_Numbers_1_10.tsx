@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { audio } from '@engine/audio/AudioPlayer';
 import { getRandomEncourageKey, getRandomPraiseKey } from '@engine/audio/manifest';
@@ -6,9 +6,13 @@ import { recordAttempt } from '@engine/progress/srs';
 import { useAppStore } from '@engine/state/store';
 import { shuffle } from '@engine/util/shuffle';
 import PixelIcon from '@ui/components/PixelIcon';
+import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
 import { BlockRow } from '@ui/components/CountBlocks';
 import type { LevelProps, LevelResult } from '@subjects/types';
+
+type ItemType = 'block-blue' | 'block-red' | 'block-green' | 'block-yellow' | 'star' | 'heart' | 'coin';
+const ITEM_TYPES: ItemType[] = ['block-blue', 'block-red', 'block-green', 'block-yellow', 'star', 'heart', 'coin'];
 
 /**
  * Level 1.1: Zahlen 1–10
@@ -19,31 +23,34 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
   const { t } = useTranslation();
   const profile = useAppStore((s) => s.activeProfile);
   const [taskIndex, setTaskIndex] = useState(0);
-  const [correct, setCorrect] = useState(0);
+  // correctRef vermeidet Stale-Closure-Bug beim finalize() im setTimeout.
+  // (setState ist async; ohne ref liest finalize einen veralteten correct-Wert.)
+  const correctRef = useRef(0);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const startedAt = useMemo(() => Date.now(), []);
-  const attempts: { taskKey: string; correct: boolean }[] = useMemo(() => [], []);
+  const attempts = useRef<{ taskKey: string; correct: boolean }[]>([]);
 
   const tasks = useMemo(() => generateTasks(5), []);
   const current = tasks[taskIndex];
+  const itemQuestionLabel = useMemo(() => labelForItem(current?.item ?? 'block-blue'), [current?.item]);
 
   useEffect(() => {
     audio.play('math/level_1_1_intro', { fallbackToTTS: true });
   }, []);
 
   useEffect(() => {
-    if (current) audio.speak('Wie viele Blöcke siehst du?');
-  }, [taskIndex, current]);
+    if (current) audio.speak(`Wie viele ${itemQuestionLabel} siehst du?`);
+  }, [taskIndex, current, itemQuestionLabel]);
 
   const handleAnswer = async (chosen: number) => {
     if (feedback) return;
     const isCorrect = chosen === current.answer;
     const taskKey = `math:count:${current.answer}`;
-    attempts.push({ taskKey, correct: isCorrect });
+    attempts.current.push({ taskKey, correct: isCorrect });
     if (profile) await recordAttempt(profile.id, 'math', taskKey, isCorrect);
 
     if (isCorrect) {
-      setCorrect((c) => c + 1);
+      correctRef.current += 1;
       setFeedback('correct');
       audio.play(getRandomPraiseKey(), { fallbackToTTS: true });
     } else {
@@ -60,7 +67,8 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
 
   const finalize = () => {
     const total = tasks.length;
-    const accuracy = correct / total;
+    const correctCount = correctRef.current;
+    const accuracy = correctCount / total;
     const durationMs = Date.now() - startedAt;
     let stars: 0 | 1 | 2 | 3 = 0;
     if (accuracy >= 0.6) stars = 1;
@@ -68,12 +76,12 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
     if (accuracy === 1) stars = 3;
 
     const result: LevelResult = {
-      correct,
+      correct: correctCount,
       total,
       durationMs,
       stars,
       taskKeys: tasks.map((t) => `math:count:${t.answer}`),
-      attempts,
+      attempts: attempts.current,
     };
     onComplete(result);
   };
@@ -88,29 +96,21 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
   return (
     <div className="w-full h-full flex flex-col items-center p-6">
       <header className="w-full max-w-4xl flex items-center justify-between mb-2">
-        <button onClick={onExit} className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0" aria-label="Zurück">
+        <IconButton onClick={onExit} aria-label="Zurück">
           <PixelIcon name="arrow-left" size={26} tone="white" />
-        </button>
+        </IconButton>
         <span className="font-pixel text-[16px] text-white/70">{taskIndex + 1} / {tasks.length}</span>
-        <button
-          onClick={() => audio.speak('Wie viele Blöcke siehst du?')}
-          className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0"
-          aria-label="Vorlesen"
-        >
+        <IconButton onClick={() => audio.speak(`Wie viele ${itemQuestionLabel} siehst du?`)} aria-label="Vorlesen">
           <PixelIcon name="speaker" size={26} tone="white" />
-        </button>
+        </IconButton>
       </header>
-
-      {profile && (
-        <ProgressRoute totalSteps={tasks.length + 1} currentStep={routeStep} character={profile.character} lastResult={feedback} />
-      )}
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
         <div className="text-4xl sm:text-5xl font-body font-bold text-white/90 text-center">
-          Wie viele Blöcke siehst du?
+          Wie viele {itemQuestionLabel} siehst du?
         </div>
 
-        <BlockRow count={current.answer} color="red" />
+        <ItemRow count={current.answer} item={current.item} />
 
         <div className="flex justify-center gap-5 mt-4">
           {current.options.map((opt) => {
@@ -133,10 +133,14 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
         </div>
       </div>
 
-      <footer className="font-pixel text-[18px] h-10">
+      <div className="font-pixel text-[18px] h-8 mb-2">
         {feedback === 'correct' && <span className="text-accent-success">{t('task.correct')}</span>}
         {feedback === 'wrong' && <span className="text-accent-warn">{t('task.wrong')}</span>}
-      </footer>
+      </div>
+
+      {profile && (
+        <ProgressRoute totalSteps={tasks.length + 1} currentStep={routeStep} character={profile.character} lastResult={feedback} />
+      )}
     </div>
   );
 }
@@ -161,6 +165,7 @@ export function CountRow({ count, icon }: { count: number; icon: 'apple' | 'star
 interface CountTask {
   answer: number;
   options: number[];
+  item: ItemType;
 }
 
 function generateTasks(count: number): CountTask[] {
@@ -177,9 +182,40 @@ function generateTasks(count: number): CountTask[] {
       if (candidate !== answer) distractorPool.add(candidate);
     }
     const options = shuffle([answer, ...distractorPool]);
-    tasks.push({ answer, options });
+    const item = ITEM_TYPES[tasks.length % ITEM_TYPES.length];
+    tasks.push({ answer, options, item });
   }
   return tasks;
+}
+
+function ItemRow({ count, item }: { count: number; item: ItemType }) {
+  // Block-Items nutzen die schnellen CountBlocks, Pixel-Items das Icon.
+  if (item.startsWith('block-')) {
+    const color = item.replace('block-', '') as 'blue' | 'red' | 'green' | 'yellow';
+    return <BlockRow count={count} color={color} />;
+  }
+  const size = count <= 4 ? 96 : count <= 6 ? 80 : count <= 8 ? 68 : 56;
+  return (
+    <div className="flex flex-row items-center justify-center gap-3 max-w-full">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="animate-pop shrink-0" style={{ animationDelay: `${i * 40}ms` }}>
+          <PixelIcon name={item as 'star' | 'heart' | 'coin'} size={size} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function labelForItem(item: ItemType): string {
+  switch (item) {
+    case 'block-blue': return 'blaue Blöcke';
+    case 'block-red': return 'rote Blöcke';
+    case 'block-green': return 'grüne Blöcke';
+    case 'block-yellow': return 'gelbe Blöcke';
+    case 'star': return 'Sterne';
+    case 'heart': return 'Herzen';
+    case 'coin': return 'Münzen';
+  }
 }
 
 function clamp(n: number, min: number, max: number) {

@@ -40,6 +40,7 @@ export default function PixelButton({
       {...rest}
       className={[
         'pixel-btn',
+        size !== 'icon' ? 'pixel-btn-glossy' : '',
         sizeClasses,
         full ? 'w-full' : '',
         v.bg,

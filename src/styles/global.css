@@ -41,7 +41,8 @@
     text-rendering: geometricPrecision;
     image-rendering: pixelated;
   }
-  .pixel-btn::before {
+  /* Glossiger Top-Highlight nur für CTAs mit .pixel-btn-glossy */
+  .pixel-btn-glossy::before {
     content: '';
     position: absolute;
     inset: 0;

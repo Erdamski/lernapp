@@ -6,6 +6,7 @@ import OnboardingScreen from '@ui/screens/OnboardingScreen';
 import ParentGate from '@ui/screens/ParentGate';
 import ParentDashboard from '@ui/screens/ParentDashboard';
 import WelcomeOverlay from '@ui/components/WelcomeOverlay';
+import AnimatedBackground from '@ui/components/AnimatedBackground';
 import { useAppStore } from '@engine/state/store';
 import { audio } from '@engine/audio/AudioPlayer';
 
@@ -37,8 +38,12 @@ export default function App() {
     setScreen(activeProfile.onboardingDone ? 'world-map' : 'onboarding');
   };
 
+  // Theme-Wahl für Hintergrund je nach Screen
+  const bgTheme = screen === 'world-map' || screen === 'onboarding' ? 'math' : 'world';
+
   return (
-    <div className="w-screen h-screen overflow-hidden bg-gradient-to-b from-slate-900 to-indigo-950 text-white font-body">
+    <div className="w-screen h-screen overflow-hidden text-white font-body relative">
+      <AnimatedBackground theme={bgTheme} />
       {screen === 'profile-select' && (
         <ProfileSelect onParentZone={() => setScreen('parent-gate')} />
       )}

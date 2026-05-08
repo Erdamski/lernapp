@@ -10,6 +10,7 @@ import { db } from '@engine/db/schema';
 import PixelButton from '@ui/components/PixelButton';
 import PixelIcon from '@ui/components/PixelIcon';
 import PixelTitle from '@ui/components/PixelTitle';
+import IconButton from '@ui/components/IconButton';
 import type { ProgressEntry } from '@engine/db/schema';
 
 type View = 'islands' | 'world' | 'level' | 'shop' | 'level-result';
@@ -49,11 +50,11 @@ export default function WorldMapScreen() {
     return (
       <div className="w-full h-full flex flex-col p-6">
         <header className="flex items-center justify-between max-w-6xl mx-auto w-full mb-6">
-          <button onClick={logout} className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0" aria-label="Profil wechseln">
+          <IconButton onClick={logout} aria-label="Profil wechseln">
             <PixelIcon name="swap" size={26} tone="white" />
-          </button>
+          </IconButton>
           <PixelTitle size="lg">{t('world.map_title')}</PixelTitle>
-          <button onClick={() => setView('shop')} className="pixel-btn bg-accent-coin border-ink shadow-amber-700 shadow-pixel-md px-4 h-14 flex items-center gap-2">
+          <button onClick={() => setView('shop')} className="pixel-btn pixel-btn-glossy bg-accent-coin border-ink shadow-amber-700 shadow-pixel-md px-4 h-14 flex items-center gap-2">
             <PixelIcon name="coin" size={24} />
             <span className="font-pixel text-[14px] text-ink">{profile.coins}</span>
           </button>
@@ -99,16 +100,13 @@ export default function WorldMapScreen() {
     return (
       <div className="w-full h-full flex flex-col p-6">
         <header className="flex items-center justify-between max-w-6xl mx-auto w-full mb-6">
-          <button onClick={() => setView('islands')} className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0">
+          <IconButton onClick={() => setView('islands')}>
             <PixelIcon name="arrow-left" size={26} tone="white" />
-          </button>
+          </IconButton>
           <PixelTitle size="md">{t(activeWorld.labelKey, `Klasse ${activeWorld.classLevel}`)}</PixelTitle>
-          <button
-            onClick={() => audio.play(activeWorld.introAudioKey, { fallbackToTTS: true })}
-            className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0"
-          >
+          <IconButton onClick={() => audio.play(activeWorld.introAudioKey, { fallbackToTTS: true })}>
             <PixelIcon name="speaker" size={26} tone="white" />
-          </button>
+          </IconButton>
         </header>
 
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto w-full content-start">
