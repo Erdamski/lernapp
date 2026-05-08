@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import {
   BOTTOM_COLORS,
   HAIR_COLORS,
@@ -16,8 +17,11 @@ interface Props {
 /**
  * Minecraft-inspirierter Pixel-Charakter, gerendert als SVG.
  * 32 x 48 Pixel-Grid. shapeRendering="crispEdges" sorgt für scharfe Pixel-Optik.
+ *
+ * memo, da der Charakter oft mit gleichen Props re-rendert
+ * (z. B. in ProgressRoute bei jedem Render des übergeordneten Screens).
  */
-export default function PixelCharacter({ config, size = 96, bg = '#1f1d2e' }: Props) {
+export default memo(function PixelCharacter({ config, size = 96, bg = '#1f1d2e' }: Props) {
   const skin = SKIN_COLORS[config.skinId];
   const hair = HAIR_COLORS[config.hairColorId];
   const top = TOP_COLORS[config.topId];
@@ -79,7 +83,7 @@ export default function PixelCharacter({ config, size = 96, bg = '#1f1d2e' }: Pr
       <rect x="17" y="46" width="6" height="2" fill="#262626" />
     </svg>
   );
-}
+});
 
 function HairTop({ style, color, shadow }: { style: HairId; color: string; shadow: string }) {
   switch (style) {

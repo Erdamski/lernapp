@@ -41,6 +41,8 @@ export type IconName =
   | 'play'
   | 'pause';
 
+import { memo } from 'react';
+
 interface Props {
   name: IconName;
   size?: number;
@@ -48,7 +50,7 @@ interface Props {
   className?: string;
 }
 
-export default function PixelIcon({ name, size = 24, tone = 'default', className = '' }: Props) {
+export default memo(function PixelIcon({ name, size = 24, tone = 'default', className = '' }: Props) {
   return (
     <svg
       width={size}
@@ -60,7 +62,7 @@ export default function PixelIcon({ name, size = 24, tone = 'default', className
       {ICONS[name](tone)}
     </svg>
   );
-}
+});
 
 // Hilfs-Render-Funktion: Pixel als <rect>
 function p(x: number, y: number, fill: string, w = 1, h = 1) {
@@ -305,38 +307,37 @@ const ICONS: Record<IconName, (tone: ToneKey) => JSX.Element> = {
 
   apple: () => {
     const c = colors('default');
+    // Chunkigerer Apfel mit größeren Pixel-Blöcken und stärkerem Kontrast.
     return (
       <g>
-        {/* Stem */}
-        {p(8, 2, c.brown)}
-        {p(7, 3, c.brown)}
+        {/* Stem (chunkier) */}
+        {p(8, 1, c.brown, 1, 2)}
         {/* Leaf */}
-        {p(9, 2, c.green)}
-        {p(10, 2, c.green)}
-        {p(9, 3, c.green)}
-        {/* Apple body */}
+        {p(9, 2, c.green, 3, 1)}
+        {p(10, 1, c.green, 1, 1)}
+        {p(11, 2, c.green, 1, 1)}
+        {/* Top outline */}
+        {p(4, 3, c.redDeep, 8, 1)}
+        {p(3, 4, c.redDeep, 1, 1)}
+        {p(12, 4, c.redDeep, 1, 1)}
+        {/* Apple body – große Blöcke */}
         {p(4, 4, c.red, 8, 1)}
-        {p(3, 5, c.red, 10, 1)}
-        {p(2, 6, c.red, 12, 6)}
-        {p(3, 12, c.red, 10, 1)}
-        {p(4, 13, c.red, 8, 1)}
-        {p(5, 14, c.red, 6, 1)}
-        {/* Highlight */}
-        {p(5, 5, c.pink, 2, 1)}
-        {p(4, 6, c.pink, 2, 2)}
-        {/* Outline */}
-        {p(3, 4, c.redDeep)}
-        {p(12, 4, c.redDeep)}
-        {p(2, 5, c.redDeep)}
-        {p(13, 5, c.redDeep)}
-        {p(1, 6, c.redDeep, 1, 6)}
-        {p(14, 6, c.redDeep, 1, 6)}
-        {p(2, 12, c.redDeep)}
-        {p(13, 12, c.redDeep)}
-        {p(3, 13, c.redDeep)}
-        {p(12, 13, c.redDeep)}
-        {p(4, 14, c.redDeep)}
-        {p(11, 14, c.redDeep)}
+        {p(3, 5, c.red, 10, 7)}
+        {p(4, 12, c.red, 8, 1)}
+        {p(5, 13, c.red, 6, 1)}
+        {/* Side outlines */}
+        {p(2, 5, c.redDeep, 1, 7)}
+        {p(13, 5, c.redDeep, 1, 7)}
+        {p(3, 12, c.redDeep, 1, 1)}
+        {p(12, 12, c.redDeep, 1, 1)}
+        {p(4, 13, c.redDeep, 1, 1)}
+        {p(11, 13, c.redDeep, 1, 1)}
+        {p(5, 14, c.redDeep, 6, 1)}
+        {/* Big highlight – chunky */}
+        {p(4, 5, c.pink, 2, 2)}
+        {p(5, 7, c.pink, 1, 1)}
+        {/* Shadow at bottom */}
+        {p(4, 11, c.redDeep, 8, 1)}
       </g>
     );
   },

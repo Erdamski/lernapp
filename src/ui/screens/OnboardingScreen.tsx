@@ -7,6 +7,8 @@ import { shuffle } from '@engine/util/shuffle';
 import PixelButton from '@ui/components/PixelButton';
 import PixelIcon from '@ui/components/PixelIcon';
 import PixelTitle from '@ui/components/PixelTitle';
+import ProgressRoute from '@ui/components/ProgressRoute';
+import { BlockRow, MathBlocks } from '@ui/components/CountBlocks';
 
 interface Props {
   onDone: () => void;
@@ -68,7 +70,7 @@ export default function OnboardingScreen({ onDone }: Props) {
       } else {
         setTaskIndex((i) => i + 1);
       }
-    }, 1200);
+    }, 700);
   };
 
   const finalize = async () => {
@@ -77,7 +79,7 @@ export default function OnboardingScreen({ onDone }: Props) {
     setTimeout(async () => {
       await setOnboardingDone();
       onDone();
-    }, 2000);
+    }, 1500);
   };
 
   if (stage === 'intro') {
@@ -108,10 +110,12 @@ export default function OnboardingScreen({ onDone }: Props) {
     );
   }
 
+  const routeStep = feedback ? taskIndex + 1 : taskIndex;
+
   return (
     <div className="w-full h-full flex flex-col items-center p-6">
-      <header className="w-full flex items-center justify-between max-w-4xl">
-        <span className="font-pixel text-[20px]">{taskIndex + 1} / {TASKS.length}</span>
+      <header className="w-full flex items-center justify-between max-w-4xl mb-2">
+        <span className="font-pixel text-[16px] text-white/70">{taskIndex + 1} / {TASKS.length}</span>
         <button
           onClick={() => current && audio.speak(current.question)}
           className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0"
@@ -121,24 +125,31 @@ export default function OnboardingScreen({ onDone }: Props) {
         </button>
       </header>
 
+      {profile && (
+        <ProgressRoute totalSteps={TASKS.length + 1} currentStep={routeStep} character={profile.character} lastResult={feedback} />
+      )}
+
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
         <div className="text-4xl sm:text-5xl font-body font-bold text-white/90 text-center">{current?.question}</div>
         <PromptDisplay prompt={current?.prompt ?? ''} />
 
         <div className="flex justify-center gap-5 mt-4">
-          {current?.options.map((opt) => (
-            <button
-              key={opt}
-              onClick={() => handleAnswer(opt)}
-              disabled={feedback !== null}
-              className={`pixel-btn border-ink rounded-chunk shadow-pixel-lg w-32 h-32 sm:w-36 sm:h-36 text-[44px] sm:text-[52px] font-pixel text-white transition-colors
-                ${feedback && opt === current.answer
-                  ? 'bg-accent-success shadow-emerald-900'
-                  : 'bg-primary-500 hover:bg-primary-400 shadow-ink-soft'}`}
-            >
-              {opt}
-            </button>
-          ))}
+          {current?.options.map((opt) => {
+            const showAsCorrect = feedback && opt === current.answer;
+            return (
+              <button
+                key={opt}
+                onClick={() => handleAnswer(opt)}
+                disabled={feedback !== null}
+                className={`pixel-btn border-ink rounded-chunk shadow-pixel-lg w-32 h-32 sm:w-36 sm:h-36 text-[44px] sm:text-[52px] font-pixel text-white transition-colors
+                  ${showAsCorrect
+                    ? 'bg-accent-success shadow-emerald-900'
+                    : 'bg-primary-500 active:bg-primary-600 shadow-ink-soft'}`}
+              >
+                {opt}
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -146,32 +157,19 @@ export default function OnboardingScreen({ onDone }: Props) {
 }
 
 function PromptDisplay({ prompt }: { prompt: string }) {
-  // Format: "apple:3", "star:5", "2+3", "8-3", "7+5", "13-5"
+  // Format: "apple:N", "star:N" → eine Reihe Blöcke (oder Apfel)
   if (prompt.includes(':')) {
     const [type, n] = prompt.split(':');
     const count = parseInt(n);
-    const size = count <= 4 ? 110 : count <= 6 ? 92 : count <= 8 ? 76 : 64;
-    return (
-      <div className="flex flex-row items-center justify-center gap-3 max-w-full">
-        {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="animate-pop shrink-0" style={{ animationDelay: `${i * 50}ms` }}>
-            <PixelIcon name={(type as 'apple' | 'star')} size={size} />
-          </div>
-        ))}
-      </div>
-    );
+    if (type === 'apple') return <BlockRow count={count} color="red" />;
+    if (type === 'star') return <BlockRow count={count} color="yellow" />;
+    return <BlockRow count={count} color="blue" />;
   }
-  // Math expressions
+  // Math expressions: 2+3 → 2 blaue + 3 grüne Blöcke (zum Zusammenzählen)
   const m = prompt.match(/^(\d+)\s*([+\-])\s*(\d+)$/);
   if (m) {
     const [, a, op, b] = m;
-    return (
-      <div className="flex items-center gap-6 font-pixel text-[64px]">
-        <span>{a}</span>
-        <PixelIcon name={op === '+' ? 'plus' : 'minus'} size={48} tone="white" />
-        <span>{b}</span>
-      </div>
-    );
+    return <MathBlocks a={parseInt(a)} b={parseInt(b)} op={op as '+' | '-'} />;
   }
   return <div className="font-pixel text-[48px]">{prompt}</div>;
 }

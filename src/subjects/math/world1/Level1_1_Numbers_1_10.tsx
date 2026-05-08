@@ -6,6 +6,8 @@ import { recordAttempt } from '@engine/progress/srs';
 import { useAppStore } from '@engine/state/store';
 import { shuffle } from '@engine/util/shuffle';
 import PixelIcon from '@ui/components/PixelIcon';
+import ProgressRoute from '@ui/components/ProgressRoute';
+import { BlockRow } from '@ui/components/CountBlocks';
 import type { LevelProps, LevelResult } from '@subjects/types';
 
 /**
@@ -30,7 +32,7 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
   }, []);
 
   useEffect(() => {
-    if (current) audio.speak('Wie viele Äpfel siehst du?');
+    if (current) audio.speak('Wie viele Blöcke siehst du?');
   }, [taskIndex, current]);
 
   const handleAnswer = async (chosen: number) => {
@@ -53,7 +55,7 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
       setFeedback(null);
       if (taskIndex + 1 >= tasks.length) finalize();
       else setTaskIndex((i) => i + 1);
-    }, 1400);
+    }, 800);
   };
 
   const finalize = () => {
@@ -78,15 +80,20 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
 
   if (!current) return null;
 
+  // Aktueller Schritt für die ProgressRoute = Anzahl der bereits abgeschlossenen Aufgaben.
+  // Während Feedback gezeigt wird, ist die Aufgabe quasi schon "erledigt" — wir
+  // nutzen taskIndex (vor Inkrement). Sobald taskIndex steigt, läuft der Charakter weiter.
+  const routeStep = feedback ? taskIndex + 1 : taskIndex;
+
   return (
-    <div className="w-full h-full flex flex-col items-center justify-between p-6">
-      <header className="w-full max-w-4xl flex items-center justify-between">
+    <div className="w-full h-full flex flex-col items-center p-6">
+      <header className="w-full max-w-4xl flex items-center justify-between mb-2">
         <button onClick={onExit} className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0" aria-label="Zurück">
           <PixelIcon name="arrow-left" size={26} tone="white" />
         </button>
-        <span className="font-pixel text-[20px]">{taskIndex + 1} / {tasks.length}</span>
+        <span className="font-pixel text-[16px] text-white/70">{taskIndex + 1} / {tasks.length}</span>
         <button
-          onClick={() => audio.speak('Wie viele Äpfel siehst du?')}
+          onClick={() => audio.speak('Wie viele Blöcke siehst du?')}
           className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-sm w-14 h-14 p-0"
           aria-label="Vorlesen"
         >
@@ -94,29 +101,35 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
         </button>
       </header>
 
+      {profile && (
+        <ProgressRoute totalSteps={tasks.length + 1} currentStep={routeStep} character={profile.character} lastResult={feedback} />
+      )}
+
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
         <div className="text-4xl sm:text-5xl font-body font-bold text-white/90 text-center">
-          Wie viele Äpfel siehst du?
+          Wie viele Blöcke siehst du?
         </div>
 
-        <CountRow count={current.answer} icon="apple" />
+        <BlockRow count={current.answer} color="red" />
 
         <div className="flex justify-center gap-5 mt-4">
-          {current.options.map((opt) => (
-            <button
-              key={opt}
-              onClick={() => handleAnswer(opt)}
-              disabled={feedback !== null}
-              className={`pixel-btn border-ink rounded-chunk shadow-pixel-lg w-32 h-32 sm:w-36 sm:h-36 text-[44px] sm:text-[52px] font-pixel text-white transition-colors
-                ${feedback === 'correct' && opt === current.answer
-                  ? 'bg-accent-success shadow-emerald-900'
-                  : feedback === 'wrong' && opt === current.answer
+          {current.options.map((opt) => {
+            const isCorrectFeedback = feedback === 'correct' && opt === current.answer;
+            const revealAnswer = feedback === 'wrong' && opt === current.answer;
+            return (
+              <button
+                key={opt}
+                onClick={() => handleAnswer(opt)}
+                disabled={feedback !== null}
+                className={`pixel-btn border-ink rounded-chunk shadow-pixel-lg w-32 h-32 sm:w-36 sm:h-36 text-[44px] sm:text-[52px] font-pixel text-white transition-colors
+                  ${isCorrectFeedback || revealAnswer
                     ? 'bg-accent-success shadow-emerald-900'
-                    : 'bg-primary-500 hover:bg-primary-400 shadow-ink-soft'}`}
-            >
-              {opt}
-            </button>
-          ))}
+                    : 'bg-primary-500 active:bg-primary-600 shadow-ink-soft'}`}
+              >
+                {opt}
+              </button>
+            );
+          })}
         </div>
       </div>
 
