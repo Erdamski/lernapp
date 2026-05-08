@@ -11,6 +11,7 @@ import PixelButton from '@ui/components/PixelButton';
 import PixelIcon from '@ui/components/PixelIcon';
 import PixelTitle from '@ui/components/PixelTitle';
 import IconButton from '@ui/components/IconButton';
+import WorldRoadmap from '@ui/components/WorldRoadmap';
 import type { ProgressEntry } from '@engine/db/schema';
 
 type View = 'islands' | 'world' | 'level' | 'shop' | 'level-result';
@@ -109,41 +110,22 @@ export default function WorldMapScreen() {
           </IconButton>
         </header>
 
-        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-5xl mx-auto w-full content-start">
-          {activeWorld.levels.map((level, idx) => {
-            const entry = progress.find((p) => p.levelId === level.id);
-            const previous = idx > 0 ? activeWorld.levels[idx - 1] : null;
-            const previousEntry = previous ? progress.find((p) => p.levelId === previous.id) : null;
-            const isUnlocked = idx === 0 || (previousEntry?.stars ?? 0) >= 1;
-            const stars = entry?.stars ?? 0;
+        <div className="flex-1 flex items-center justify-center w-full px-2">
+          <WorldRoadmap
+            levels={activeWorld.levels}
+            progress={progress}
+            character={profile.character}
+            theme="math"
+            onLevelTap={(level) => {
+              setActiveLevel(level);
+              setView('level');
+            }}
+          />
+        </div>
 
-            return (
-              <button
-                key={level.id}
-                onClick={() => isUnlocked && (setActiveLevel(level), setView('level'))}
-                disabled={!isUnlocked}
-                className={`pixel-btn border-ink shadow-pixel-md p-5 flex flex-col items-center gap-2 h-auto
-                  ${isUnlocked
-                    ? 'bg-primary-500 hover:bg-primary-400 shadow-ink-soft'
-                    : 'bg-bg-card shadow-black opacity-70 cursor-not-allowed'}`}
-              >
-                <PixelIcon name={isUnlocked ? 'play' : 'lock'} size={56} tone={isUnlocked ? 'white' : 'default'} />
-                <span className="font-pixel text-[14px] text-white text-center">{t(level.labelKey, `Level ${idx + 1}`)}</span>
-                <div className="flex gap-1 mt-1">
-                  {[1, 2, 3].map((s) => (
-                    <PixelIcon key={s} name={stars >= s ? 'star' : 'star-empty'} size={20} />
-                  ))}
-                </div>
-              </button>
-            );
-          })}
-
-          {activeWorld.levels.length < 8 && (
-            <div className="pixel-btn bg-bg-card border-ink-soft shadow-black shadow-pixel-md p-5 flex flex-col items-center gap-2 opacity-50 cursor-default">
-              <PixelIcon name="lock" size={56} />
-              <span className="font-pixel text-[12px] text-white/60 text-center">Bald verfügbar</span>
-            </div>
-          )}
+        {/* Aktuell ausgewählter Level-Name */}
+        <div className="text-center mt-3 mb-2">
+          <span className="font-pixel text-[14px] text-white/70">Tippe auf einen Punkt zum Spielen</span>
         </div>
       </div>
     );

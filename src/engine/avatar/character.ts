@@ -1,16 +1,9 @@
 /**
  * Pixel-Avatar-System (Minecraft-Stil).
- *
- * Aufbau:
- *   Preset wählen → einzelne Slots ändern (Hautfarbe, Frisur, Oberteil, Hose)
- *   Profilbild = Avatar.
- *
- * Items/Cosmetics für Belohnungen (Hüte, Werkzeuge etc.) kommen später als
- * separate Slots dazu, ohne diese Grundstruktur zu brechen.
  */
 
 export interface CharacterConfig {
-  presetId: string;        // wird beim Erstellen genutzt; danach editierbar
+  presetId: string;
   skinId: SkinId;
   hairId: HairId;
   hairColorId: HairColorId;
@@ -62,41 +55,13 @@ export interface CharacterPreset {
   config: CharacterConfig;
 }
 
-/**
- * 6 vorgefertigte Charaktere zur Auswahl. Mischung aus Geschlechtern und Hauttönen.
- * Kinder klicken einfach den, der ihnen gefällt.
- */
 export const CHARACTER_PRESETS: CharacterPreset[] = [
-  {
-    id: 'boy_1',
-    label: 'Max',
-    config: { presetId: 'boy_1', skinId: 'tan', hairId: 'short', hairColorId: 'brown', topId: 'tshirt_red', bottomId: 'pants_blue' },
-  },
-  {
-    id: 'boy_2',
-    label: 'Leo',
-    config: { presetId: 'boy_2', skinId: 'light', hairId: 'spiky', hairColorId: 'black', topId: 'hoodie_green', bottomId: 'pants_grey' },
-  },
-  {
-    id: 'boy_3',
-    label: 'Theo',
-    config: { presetId: 'boy_3', skinId: 'brown', hairId: 'short', hairColorId: 'black', topId: 'tshirt_blue', bottomId: 'pants_brown' },
-  },
-  {
-    id: 'girl_1',
-    label: 'Mia',
-    config: { presetId: 'girl_1', skinId: 'light', hairId: 'long', hairColorId: 'blonde', topId: 'tshirt_pink', bottomId: 'skirt_purple' },
-  },
-  {
-    id: 'girl_2',
-    label: 'Lina',
-    config: { presetId: 'girl_2', skinId: 'tan', hairId: 'pony', hairColorId: 'brown', topId: 'tshirt_yellow', bottomId: 'pants_blue' },
-  },
-  {
-    id: 'girl_3',
-    label: 'Ada',
-    config: { presetId: 'girl_3', skinId: 'dark', hairId: 'bun', hairColorId: 'black', topId: 'tshirt_blue', bottomId: 'shorts_red' },
-  },
+  { id: 'boy_1', label: 'Max', config: { presetId: 'boy_1', skinId: 'tan', hairId: 'short', hairColorId: 'brown', topId: 'tshirt_red', bottomId: 'pants_blue' } },
+  { id: 'boy_2', label: 'Leo', config: { presetId: 'boy_2', skinId: 'light', hairId: 'spiky', hairColorId: 'black', topId: 'hoodie_green', bottomId: 'pants_grey' } },
+  { id: 'boy_3', label: 'Theo', config: { presetId: 'boy_3', skinId: 'brown', hairId: 'short', hairColorId: 'black', topId: 'tshirt_blue', bottomId: 'pants_brown' } },
+  { id: 'girl_1', label: 'Mia', config: { presetId: 'girl_1', skinId: 'light', hairId: 'long', hairColorId: 'blonde', topId: 'tshirt_pink', bottomId: 'skirt_purple' } },
+  { id: 'girl_2', label: 'Lina', config: { presetId: 'girl_2', skinId: 'tan', hairId: 'pony', hairColorId: 'brown', topId: 'tshirt_yellow', bottomId: 'pants_blue' } },
+  { id: 'girl_3', label: 'Ada', config: { presetId: 'girl_3', skinId: 'dark', hairId: 'bun', hairColorId: 'black', topId: 'tshirt_blue', bottomId: 'shorts_red' } },
 ];
 
 export const SKIN_OPTIONS: SkinId[] = ['light', 'tan', 'olive', 'brown', 'dark'];
@@ -109,10 +74,6 @@ export function getDefaultCharacter(): CharacterConfig {
   return CHARACTER_PRESETS[0].config;
 }
 
-/**
- * Migration: Falls eine alte AvatarConfig (mit baseColor/outfitId etc.) im Storage liegt,
- * konvertieren wir sie auf den neuen Typ.
- */
 export function normalizeCharacter(input: unknown): CharacterConfig {
   if (!input || typeof input !== 'object') return getDefaultCharacter();
   const c = input as Partial<CharacterConfig>;

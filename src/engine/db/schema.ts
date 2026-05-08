@@ -98,16 +98,11 @@ export class LernappDB extends Dexie {
         audioCache: 'id, profileId, kind',
       })
       .upgrade(async (tx) => {
-        // Alte Profile mit veraltetem `avatar`-Feld auf neues `character` umstellen
         await tx.table('profiles').toCollection().modify((p: Record<string, unknown>) => {
           if (!p.character) {
             p.character = {
-              presetId: 'boy_1',
-              skinId: 'tan',
-              hairId: 'short',
-              hairColorId: 'brown',
-              topId: 'tshirt_red',
-              bottomId: 'pants_blue',
+              presetId: 'boy_1', skinId: 'tan', hairId: 'short', hairColorId: 'brown',
+              topId: 'tshirt_red', bottomId: 'pants_blue',
             };
           }
           delete p.avatar;
