@@ -1,0 +1,79 @@
+{
+  "app": {
+    "title": "Learning App",
+    "loading": "Loading …"
+  },
+  "profile": {
+    "select_title": "Who's playing?",
+    "create_new": "New profile",
+    "name": "Name",
+    "age": "Age",
+    "language": "Language",
+    "create": "Create profile",
+    "delete": "Delete profile",
+    "parent_zone": "Parent zone"
+  },
+  "pin": {
+    "set_title": "Set PIN",
+    "enter_title": "Enter PIN",
+    "wrong": "Wrong PIN",
+    "skip": "Skip PIN"
+  },
+  "onboarding": {
+    "title": "The dragon tests your skills",
+    "intro": "Let's see what you already know!",
+    "start": "Let's go",
+    "done_title": "Great job!",
+    "done_text": "Now the adventure begins."
+  },
+  "world": {
+    "map_title": "Where to?",
+    "locked": "Locked",
+    "stars": "Stars",
+    "coins": "Coins"
+  },
+  "task": {
+    "correct": "Correct!",
+    "wrong": "Try again",
+    "next": "Next",
+    "hint": "Hint"
+  },
+  "avatar": {
+    "title": "Your character",
+    "outfit": "Outfit",
+    "hat": "Hat",
+    "tool": "Tool",
+    "locked_hint": "Reach level {{level}}"
+  },
+  "parent": {
+    "gate_title": "Parent zone",
+    "gate_pin": "Parent PIN",
+    "dashboard_title": "Overview",
+    "today": "Today",
+    "this_week": "This week",
+    "settings": "Settings",
+    "play_time_limit": "Play time limit",
+    "exit": "Back"
+  },
+  "subjects": {
+    "math": "Math",
+    "german": "German",
+    "english": "English",
+    "turkish": "Turkish",
+    "russian": "Russian"
+  },
+  "math": {
+    "world1_label": "Grade 1 · Number Land",
+    "world2_label": "Grade 2 · Times Table",
+    "world3_label": "Grade 3 · Thousands World",
+    "world4_label": "Grade 4 · Millions World",
+    "level_1_1_label": "Numbers 1–10",
+    "level_1_2_label": "Decomposition",
+    "level_1_3_label": "Plus up to 10",
+    "level_1_4_label": "Minus up to 10",
+    "level_1_5_label": "Numbers up to 20",
+    "level_1_6_label": "+/− up to 20",
+    "level_1_7_label": "Crossing tens",
+    "level_1_8_label": "Shapes & money"
+  }
+}

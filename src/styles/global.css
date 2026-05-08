@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    overscroll-behavior: none;
+    font-family: 'Nunito', system-ui, sans-serif;
+  }
+  h1, h2, h3, button {
+    font-family: 'Fredoka', system-ui, sans-serif;
+  }
+  /* Disable iOS double-tap zoom */
+  * {
+    touch-action: manipulation;
+  }
+}
+
+@layer components {
+  .btn-pop {
+    @apply transition-transform active:scale-95;
+  }
+  .card-tile {
+    @apply rounded-3xl shadow-xl border-4 border-white/10 backdrop-blur;
+  }
+}

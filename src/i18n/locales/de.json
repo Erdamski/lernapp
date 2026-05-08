@@ -1,0 +1,79 @@
+{
+  "app": {
+    "title": "Lernapp",
+    "loading": "Lädt …"
+  },
+  "profile": {
+    "select_title": "Wer spielt?",
+    "create_new": "Neues Profil",
+    "name": "Name",
+    "age": "Alter",
+    "language": "Sprache",
+    "create": "Profil erstellen",
+    "delete": "Profil löschen",
+    "parent_zone": "Eltern-Bereich"
+  },
+  "pin": {
+    "set_title": "PIN festlegen",
+    "enter_title": "PIN eingeben",
+    "wrong": "Falsche PIN",
+    "skip": "Ohne PIN"
+  },
+  "onboarding": {
+    "title": "Der Drache prüft dein Wissen",
+    "intro": "Schauen wir mal, was du schon kannst!",
+    "start": "Los geht's",
+    "done_title": "Super gemacht!",
+    "done_text": "Jetzt kann das Abenteuer beginnen."
+  },
+  "world": {
+    "map_title": "Wohin willst du?",
+    "locked": "Noch gesperrt",
+    "stars": "Sterne",
+    "coins": "Münzen"
+  },
+  "task": {
+    "correct": "Richtig!",
+    "wrong": "Probier's nochmal",
+    "next": "Weiter",
+    "hint": "Tipp"
+  },
+  "avatar": {
+    "title": "Dein Charakter",
+    "outfit": "Outfit",
+    "hat": "Hut",
+    "tool": "Werkzeug",
+    "locked_hint": "Erreiche Level {{level}}"
+  },
+  "parent": {
+    "gate_title": "Eltern-Bereich",
+    "gate_pin": "Eltern-PIN",
+    "dashboard_title": "Übersicht",
+    "today": "Heute",
+    "this_week": "Diese Woche",
+    "settings": "Einstellungen",
+    "play_time_limit": "Spielzeit-Limit",
+    "exit": "Zurück"
+  },
+  "subjects": {
+    "math": "Mathematik",
+    "german": "Deutsch",
+    "english": "Englisch",
+    "turkish": "Türkisch",
+    "russian": "Russisch"
+  },
+  "math": {
+    "world1_label": "Klasse 1 · Zahlenland",
+    "world2_label": "Klasse 2 · Einmaleins",
+    "world3_label": "Klasse 3 · Tausenderwelt",
+    "world4_label": "Klasse 4 · Millionenwelt",
+    "level_1_1_label": "Zahlen 1–10",
+    "level_1_2_label": "Zahlzerlegung",
+    "level_1_3_label": "Plus bis 10",
+    "level_1_4_label": "Minus bis 10",
+    "level_1_5_label": "Zahlen bis 20",
+    "level_1_6_label": "+/− bis 20",
+    "level_1_7_label": "Zehnerübergang",
+    "level_1_8_label": "Formen & Geld"
+  }
+}

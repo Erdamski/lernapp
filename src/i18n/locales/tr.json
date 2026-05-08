@@ -1,0 +1,79 @@
+{
+  "app": {
+    "title": "Öğrenme Uygulaması",
+    "loading": "Yükleniyor …"
+  },
+  "profile": {
+    "select_title": "Kim oynuyor?",
+    "create_new": "Yeni profil",
+    "name": "İsim",
+    "age": "Yaş",
+    "language": "Dil",
+    "create": "Profil oluştur",
+    "delete": "Profili sil",
+    "parent_zone": "Ebeveyn alanı"
+  },
+  "pin": {
+    "set_title": "PIN belirle",
+    "enter_title": "PIN gir",
+    "wrong": "Yanlış PIN",
+    "skip": "PIN olmadan"
+  },
+  "onboarding": {
+    "title": "Ejderha bilgini test ediyor",
+    "intro": "Neler bildiğine bakalım!",
+    "start": "Başla",
+    "done_title": "Harika iş!",
+    "done_text": "Şimdi macera başlıyor."
+  },
+  "world": {
+    "map_title": "Nereye?",
+    "locked": "Kilitli",
+    "stars": "Yıldız",
+    "coins": "Para"
+  },
+  "task": {
+    "correct": "Doğru!",
+    "wrong": "Tekrar dene",
+    "next": "İleri",
+    "hint": "İpucu"
+  },
+  "avatar": {
+    "title": "Karakterin",
+    "outfit": "Kıyafet",
+    "hat": "Şapka",
+    "tool": "Alet",
+    "locked_hint": "Seviye {{level}}'e ulaş"
+  },
+  "parent": {
+    "gate_title": "Ebeveyn alanı",
+    "gate_pin": "Ebeveyn PIN",
+    "dashboard_title": "Genel bakış",
+    "today": "Bugün",
+    "this_week": "Bu hafta",
+    "settings": "Ayarlar",
+    "play_time_limit": "Oyun süresi sınırı",
+    "exit": "Geri"
+  },
+  "subjects": {
+    "math": "Matematik",
+    "german": "Almanca",
+    "english": "İngilizce",
+    "turkish": "Türkçe",
+    "russian": "Rusça"
+  },
+  "math": {
+    "world1_label": "1. Sınıf · Sayılar Diyarı",
+    "world2_label": "2. Sınıf · Çarpım Tablosu",
+    "world3_label": "3. Sınıf · Binler Dünyası",
+    "world4_label": "4. Sınıf · Milyonlar Dünyası",
+    "level_1_1_label": "Sayılar 1–10",
+    "level_1_2_label": "Sayıyı Ayırma",
+    "level_1_3_label": "10'a Kadar Toplama",
+    "level_1_4_label": "10'a Kadar Çıkarma",
+    "level_1_5_label": "20'ye Kadar Sayılar",
+    "level_1_6_label": "20'ye Kadar +/−",
+    "level_1_7_label": "Onluk Geçiş",
+    "level_1_8_label": "Şekiller & Para"
+  }
+}

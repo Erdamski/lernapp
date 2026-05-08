@@ -19,6 +19,7 @@ out/
 .cache/
 .parcel-cache/
 .vite/
+*.tsbuildinfo
 
 # Audio cache (generierte ElevenLabs-Dateien können groß werden)
 # Wir entscheiden später, ob committen oder nicht
