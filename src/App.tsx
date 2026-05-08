@@ -55,12 +55,20 @@ export default function App() {
       {screen === 'welcome' && activeProfile && (
         <WelcomeOverlay profile={activeProfile} onDone={handleWelcomeDone} />
       )}
-      {screen === 'onboarding' && <OnboardingScreen onDone={() => setScreen('world-map')} />}
+      {screen === 'onboarding' && (
+        <div className="w-full h-full bg-gradient-to-b from-bg-deep to-bg-mid">
+          <OnboardingScreen onDone={() => setScreen('world-map')} />
+        </div>
+      )}
       {screen === 'world-map' && <WorldMapScreen />}
       {screen === 'parent-gate' && (
         <ParentGate onSuccess={() => setScreen('parent-dashboard')} onCancel={() => setScreen('profile-select')} />
       )}
-      {screen === 'parent-dashboard' && <ParentDashboard onExit={() => setScreen('profile-select')} />}
+      {screen === 'parent-dashboard' && (
+        <div className="w-full h-full bg-gradient-to-b from-bg-deep to-bg-mid">
+          <ParentDashboard onExit={() => setScreen('profile-select')} />
+        </div>
+      )}
     </div>
   );
 }

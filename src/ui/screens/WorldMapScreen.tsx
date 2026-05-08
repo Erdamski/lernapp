@@ -138,26 +138,34 @@ export default function WorldMapScreen() {
 
   if (view === 'level' && activeLevel) {
     const Component = activeLevel.component;
-    return <Component onComplete={handleLevelComplete} onExit={() => setView('world')} />;
+    // Level läuft auf dunklem Spiel-Hintergrund, damit die hellen Sky-Farben
+    // nicht von Frage-/Antwort-Texten ablenken.
+    return (
+      <div className="w-full h-full bg-gradient-to-b from-bg-deep to-bg-mid">
+        <Component onComplete={handleLevelComplete} onExit={() => setView('world')} />
+      </div>
+    );
   }
 
   if (view === 'level-result' && lastResult && activeWorld && activeLevel) {
     const currentIdx = activeWorld.levels.findIndex((l) => l.id === activeLevel.id);
     const nextLevel = lastResult.stars >= 1 && currentIdx >= 0 ? activeWorld.levels[currentIdx + 1] : undefined;
     return (
-      <LevelResultScreen
-        result={lastResult}
-        onWorld={() => setView('world')}
-        onAgain={() => setView('level')}
-        onNext={
-          nextLevel
-            ? () => {
-                setActiveLevel(nextLevel);
-                setView('level');
-              }
-            : undefined
-        }
-      />
+      <div className="w-full h-full bg-gradient-to-b from-bg-deep to-bg-mid">
+        <LevelResultScreen
+          result={lastResult}
+          onWorld={() => setView('world')}
+          onAgain={() => setView('level')}
+          onNext={
+            nextLevel
+              ? () => {
+                  setActiveLevel(nextLevel);
+                  setView('level');
+                }
+              : undefined
+          }
+        />
+      </div>
     );
   }
 
