@@ -10,7 +10,8 @@ import PixelIcon from '@ui/components/PixelIcon';
 import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
 import AnswerButton from '@ui/components/AnswerButton';
-import { MathBlocks } from '@ui/components/CountBlocks';
+import MathItems, { pickSingleItem } from '@ui/components/MathItems';
+import type { CountItemKind } from '@ui/components/PixelItem';
 import type { LevelProps } from '@subjects/types';
 
 interface MinusTask {
@@ -18,6 +19,7 @@ interface MinusTask {
   b: number;
   answer: number;
   options: number[];
+  item: CountItemKind;
 }
 
 export default function Level1_4_Minus_10({ onComplete, onExit }: LevelProps) {
@@ -110,7 +112,7 @@ export default function Level1_4_Minus_10({ onComplete, onExit }: LevelProps) {
           </IconButton>
         </div>
 
-        <MathBlocks a={current.a} b={current.b} op="-" />
+        <MathItems a={current.a} b={current.b} op="-" itemA={current.item} />
 
         <div className="flex justify-center gap-5 mt-4">
           {current.options.map((opt) => (
@@ -154,7 +156,7 @@ function generateMinusTasks(count: number): MinusTask[] {
       const candidate = answer + (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 2) + 1);
       if (candidate !== answer && candidate >= 0 && candidate <= 10) distractors.add(candidate);
     }
-    tasks.push({ a, b, answer, options: shuffle([answer, ...distractors]) });
+    tasks.push({ a, b, answer, options: shuffle([answer, ...distractors]), item: pickSingleItem() });
   }
   return tasks;
 }

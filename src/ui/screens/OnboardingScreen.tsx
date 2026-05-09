@@ -10,7 +10,7 @@ import PixelTitle from '@ui/components/PixelTitle';
 import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
 import AnswerButton from '@ui/components/AnswerButton';
-import { MathBlocks } from '@ui/components/CountBlocks';
+import MathItems, { pickItemPair, pickSingleItem } from '@ui/components/MathItems';
 import PixelItem, { COUNT_ITEMS_POOL, ITEM_LABELS_DE, type CountItemKind } from '@ui/components/PixelItem';
 
 interface Props {
@@ -189,11 +189,15 @@ function PromptDisplay({ prompt }: { prompt: string }) {
       </div>
     );
   }
-  // Math expressions: 2+3 → 2 blaue + 3 grüne Blöcke (zum Zusammenzählen)
+  // Math expressions: 2+3 → 2 Äpfel + 3 Orangen visuell
   const m = prompt.match(/^(\d+)\s*([+\-])\s*(\d+)$/);
   if (m) {
     const [, a, op, b] = m;
-    return <MathBlocks a={parseInt(a)} b={parseInt(b)} op={op as '+' | '-'} />;
+    if (op === '+') {
+      const { a: itemA, b: itemB } = pickItemPair();
+      return <MathItems a={parseInt(a)} b={parseInt(b)} op="+" itemA={itemA} itemB={itemB} />;
+    }
+    return <MathItems a={parseInt(a)} b={parseInt(b)} op="-" itemA={pickSingleItem()} />;
   }
   return <div className="font-pixel text-[48px]">{prompt}</div>;
 }

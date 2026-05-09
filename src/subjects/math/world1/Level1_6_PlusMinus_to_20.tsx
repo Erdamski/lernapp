@@ -10,7 +10,8 @@ import PixelIcon from '@ui/components/PixelIcon';
 import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
 import AnswerButton from '@ui/components/AnswerButton';
-import { MathBlocks } from '@ui/components/CountBlocks';
+import MathItems, { pickItemPair, pickSingleItem } from '@ui/components/MathItems';
+import type { CountItemKind } from '@ui/components/PixelItem';
 import type { LevelProps, LevelResult } from '@subjects/types';
 
 interface MathTask {
@@ -19,6 +20,8 @@ interface MathTask {
   op: '+' | '-';
   answer: number;
   options: number[];
+  itemA: CountItemKind;
+  itemB?: CountItemKind;
 }
 
 /**
@@ -112,7 +115,7 @@ export default function Level1_6_PlusMinus_to_20({ onComplete, onExit }: LevelPr
           </IconButton>
         </div>
 
-        <MathBlocks a={current.a} b={current.b} op={current.op} />
+        <MathItems a={current.a} b={current.b} op={current.op} itemA={current.itemA} itemB={current.itemB} />
 
         <div className="flex justify-center gap-5 mt-4">
           {current.options.map((opt) => (
@@ -173,7 +176,12 @@ function generateTasks(count: number): MathTask[] {
       const candidate = answer + (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 2) + 1);
       if (candidate !== answer && candidate >= 0 && candidate <= 20) distractors.add(candidate);
     }
-    tasks.push({ a, b, op: isPlus ? '+' : '-', answer, options: shuffle([answer, ...distractors]) });
+    if (isPlus) {
+      const { a: itemA, b: itemB } = pickItemPair();
+      tasks.push({ a, b, op: '+', answer, options: shuffle([answer, ...distractors]), itemA, itemB });
+    } else {
+      tasks.push({ a, b, op: '-', answer, options: shuffle([answer, ...distractors]), itemA: pickSingleItem() });
+    }
   }
   return tasks;
 }
