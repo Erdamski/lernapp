@@ -57,26 +57,15 @@ export default memo(function AnimatedBackground({ theme = 'world' }: Props) {
         </span>
       ))}
 
-      {/* Wiese unten */}
+      {/* Wiese unten – schlicht ohne Bäume (Bäume sind jetzt auf der ProgressRoute) */}
       <div className="absolute left-0 right-0 bottom-0" style={{
-        height: '32%',
+        height: '24%',
         background: 'linear-gradient(180deg, #86efac 0%, #4ade80 35%, #16a34a 100%)',
       }} />
       {/* Hügelwelle vor der Wiese */}
-      <svg className="absolute left-0 right-0 w-full" viewBox="0 0 100 10" preserveAspectRatio="none" style={{ bottom: '32%', height: '8%' }}>
+      <svg className="absolute left-0 right-0 w-full" viewBox="0 0 100 10" preserveAspectRatio="none" style={{ bottom: '24%', height: '6%' }}>
         <path d="M 0 10 Q 14 0 28 5 T 56 6 T 84 4 T 100 7 L 100 10 Z" fill="#16a34a" />
       </svg>
-
-      {/* Bäume und Bushes auf der Wiese */}
-      {grassItems.map((g, i) => (
-        <div
-          key={i}
-          className="absolute"
-          style={{ left: `${g.x}%`, bottom: `${g.y}%`, transform: 'translateX(-50%)' }}
-        >
-          <TileSprite index={g.tile} size={g.size} />
-        </div>
-      ))}
 
       <style>{KEYFRAMES}</style>
     </div>
