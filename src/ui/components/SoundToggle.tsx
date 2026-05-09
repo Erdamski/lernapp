@@ -10,7 +10,7 @@ const STORAGE_KEY = 'lernapp:sound-enabled';
  * Steuert sowohl Voice-Audio (ElevenLabs / TTS) als auch Sound-Effekte
  * (button-tap, coin, …). Ein Klick macht beides aus oder an.
  */
-export default function SoundToggle({ className = '' }: { className?: string }) {
+export default function SoundToggle({ className = '', style }: { className?: string; style?: React.CSSProperties }) {
   const initial = readStored();
   const [enabled, setEnabled] = useState(initial);
 
@@ -38,6 +38,7 @@ export default function SoundToggle({ className = '' }: { className?: string }) 
     <button
       onClick={toggle}
       aria-label={enabled ? 'Ton aus' : 'Ton an'}
+      style={style}
       className={`pixel-btn bg-bg-card border-0 shadow-pixel-sm shadow-ink p-0 flex items-center justify-center w-12 h-12 ${className}`}
     >
       <PixelIcon name={enabled ? 'speaker' : 'speaker-off'} size={22} tone="white" />

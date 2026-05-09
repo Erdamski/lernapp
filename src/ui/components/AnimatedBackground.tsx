@@ -20,7 +20,7 @@ export default memo(function AnimatedBackground({ theme = 'world' }: Props) {
   const grassItems = useMemo(() => generateGrassItems(), []);
 
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" style={{ background: SKY_GRADIENT }}>
+    <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ background: SKY_GRADIENT, zIndex: 0 }}>
       {/* Sonne */}
       <div className="absolute" style={{
         top: '6%',

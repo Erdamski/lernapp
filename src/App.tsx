@@ -50,9 +50,11 @@ export default function App() {
   return (
     <div className="w-screen h-screen overflow-hidden text-white font-body relative">
       <AnimatedBackground theme={bgTheme} />
+      {/* Alle Spiel-Inhalte über dem Hintergrund (AnimatedBackground sitzt bei z=0) */}
+      <div className="relative w-full h-full" style={{ zIndex: 1 }}>
       {/* Globaler Sound-Toggle – immer rechts unten erreichbar (außer Profile-Select hat Eltern-Button rechts oben) */}
       {screen !== 'profile-select' && screen !== 'parent-gate' && (
-        <SoundToggle className="fixed bottom-4 right-4 z-50" />
+        <SoundToggle className="fixed bottom-4 right-4" style={{ zIndex: 50 }} />
       )}
       {screen === 'profile-select' && (
         <ProfileSelect onParentZone={() => setScreen('parent-gate')} />
@@ -74,6 +76,7 @@ export default function App() {
           <ParentDashboard onExit={() => setScreen('profile-select')} />
         </div>
       )}
+      </div>
     </div>
   );
 }

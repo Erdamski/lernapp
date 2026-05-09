@@ -8,12 +8,13 @@
     width: 100%;
     margin: 0;
     padding: 0;
-    background: #0a0e27;
+    background: transparent;
   }
-  /* #root bewusst transparent: AnimatedBackground (fixed, z=-10) muss durchscheinen */
+  /* #root und body transparent: AnimatedBackground füllt den Viewport */
   #root {
     height: 100%;
     width: 100%;
+    background: transparent;
   }
   body {
     -webkit-tap-highlight-color: transparent;
