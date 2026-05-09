@@ -104,7 +104,7 @@ export default function Level1_5_Numbers_to_20({ onComplete, onExit }: LevelProp
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-8">
         <div className="flex items-center gap-3">
-          <div className="text-3xl sm:text-5xl font-body font-bold text-white/90 text-center">
+          <div className="text-3xl sm:text-5xl font-body font-bold text-white text-center text-outlined">
             Wie viele Blöcke siehst du?
           </div>
           <IconButton onClick={() => audio.speak('Wie viele Blöcke siehst du?')} aria-label="Frage vorlesen">

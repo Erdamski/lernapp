@@ -72,4 +72,16 @@
     letter-spacing: 0.1em;
     text-shadow: 4px 4px 0 #0a0a14;
   }
+
+  /* Starker dunkler Outline-Schatten für weißen Text auf hellem Sky-Hintergrund.
+     So bleibt der Frage-Text auch über buntem Himmel klar lesbar. */
+  .text-outlined {
+    text-shadow:
+      3px 3px 0 #0a0a14,
+      -2px -2px 0 #0a0a14,
+      2px -2px 0 #0a0a14,
+      -2px 2px 0 #0a0a14,
+      2px 2px 0 #0a0a14,
+      0 4px 6px rgba(0, 0, 0, 0.4);
+  }
 }

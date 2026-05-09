@@ -144,7 +144,7 @@ export default function OnboardingScreen({ onDone }: Props) {
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
         <div className="flex items-center gap-3">
-          <div className="text-3xl sm:text-5xl font-body font-bold text-white/90 text-center">{current?.question}</div>
+          <div className="text-3xl sm:text-5xl font-body font-bold text-white text-center text-outlined">{current?.question}</div>
           <IconButton onClick={() => current && audio.speak(current.question)} aria-label="Frage vorlesen">
             <PixelIcon name="speaker" size={26} tone="white" />
           </IconButton>

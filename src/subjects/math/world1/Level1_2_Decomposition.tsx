@@ -109,7 +109,7 @@ export default function Level1_2_Decomposition({ onComplete, onExit }: LevelProp
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
         <div className="flex items-center gap-3">
-          <div className="text-3xl sm:text-5xl font-body font-bold text-white/90 text-center">
+          <div className="text-3xl sm:text-5xl font-body font-bold text-white text-center text-outlined">
             Welche Zahl fehlt?
           </div>
           <IconButton onClick={() => audio.speak(`${current.visible} plus wie viel ist ${current.total}?`)} aria-label="Frage vorlesen">

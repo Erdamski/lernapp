@@ -39,7 +39,9 @@ export type IconName =
   | 'paint'
   | 'home'
   | 'play'
-  | 'pause';
+  | 'pause'
+  | 'globe'
+  | 'repeat';
 
 import { memo } from 'react';
 
@@ -614,6 +616,69 @@ const ICONS: Record<IconName, (tone: ToneKey) => JSX.Element> = {
       <g>
         {p(4, 3, c.ink, 2, 10)}
         {p(10, 3, c.ink, 2, 10)}
+      </g>
+    );
+  },
+  globe: () => {
+    const c = colors('default');
+    return (
+      <g>
+        {/* Outline/sphere */}
+        {p(5, 1, c.ink, 6, 1)}
+        {p(3, 2, c.ink, 2, 1)}
+        {p(11, 2, c.ink, 2, 1)}
+        {p(2, 3, c.ink, 1, 1)}
+        {p(13, 3, c.ink, 1, 1)}
+        {p(1, 4, c.ink, 1, 8)}
+        {p(14, 4, c.ink, 1, 8)}
+        {p(2, 12, c.ink, 1, 1)}
+        {p(13, 12, c.ink, 1, 1)}
+        {p(3, 13, c.ink, 2, 1)}
+        {p(11, 13, c.ink, 2, 1)}
+        {p(5, 14, c.ink, 6, 1)}
+        {/* Ozean (blau) */}
+        {p(5, 2, c.blue, 6, 1)}
+        {p(3, 3, c.blue, 10, 1)}
+        {p(2, 4, c.blue, 12, 8)}
+        {p(3, 12, c.blue, 10, 1)}
+        {p(5, 13, c.blue, 6, 1)}
+        {/* Kontinente (grün) */}
+        {p(5, 4, c.green, 2, 2)}
+        {p(8, 5, c.green, 3, 2)}
+        {p(4, 7, c.green, 4, 2)}
+        {p(9, 8, c.green, 4, 2)}
+        {p(6, 10, c.green, 3, 2)}
+        {p(11, 11, c.green, 2, 1)}
+        {/* Highlight oben */}
+        {p(4, 3, '#93c5fd', 3, 1)}
+      </g>
+    );
+  },
+  repeat: () => {
+    const c = colors('default');
+    // Kreisförmiger Pfeil, der links zurück und rechts nach vorne zeigt
+    return (
+      <g>
+        {/* Ring */}
+        {p(5, 2, c.ink, 6, 1)}
+        {p(3, 3, c.ink, 1, 1)}
+        {p(11, 3, c.ink, 1, 1)}
+        {p(2, 4, c.ink, 1, 2)}
+        {p(13, 4, c.ink, 1, 2)}
+        {p(2, 10, c.ink, 1, 2)}
+        {p(13, 10, c.ink, 1, 2)}
+        {p(3, 12, c.ink, 1, 1)}
+        {p(11, 12, c.ink, 1, 1)}
+        {p(5, 13, c.ink, 6, 1)}
+        {/* Inner Ring fill (transparent) – wir lassen das einfach */}
+        {/* Pfeilspitzen oben rechts (geht nach rechts) */}
+        {p(11, 1, c.ink, 1, 2)}
+        {p(12, 1, c.ink, 1, 1)}
+        {p(13, 2, c.ink, 1, 1)}
+        {/* Pfeilspitze farbig */}
+        {p(10, 4, c.green, 2, 1)}
+        {p(11, 3, c.green, 1, 1)}
+        {p(12, 4, c.green, 1, 1)}
       </g>
     );
   },

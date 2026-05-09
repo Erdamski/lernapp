@@ -102,7 +102,7 @@ export default function Level1_8_Shapes_Money_Time({ onComplete, onExit }: Level
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-8">
         <div className="flex items-center gap-3 max-w-4xl">
-          <div className="text-2xl sm:text-4xl font-body font-bold text-white/90 text-center">
+          <div className="text-2xl sm:text-4xl font-body font-bold text-white text-center text-outlined">
             {current.question}
           </div>
           <IconButton onClick={() => audio.speak(current.audioPrompt)} aria-label="Frage vorlesen">

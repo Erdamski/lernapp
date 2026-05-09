@@ -133,34 +133,27 @@ export default function WorldMapScreen() {
 
   if (view === 'level' && activeLevel) {
     const Component = activeLevel.component;
-    // Level läuft auf dunklem Spiel-Hintergrund, damit die hellen Sky-Farben
-    // nicht von Frage-/Antwort-Texten ablenken.
-    return (
-      <div className="w-full h-full" style={{ background: 'linear-gradient(180deg, #0a0e27 0%, #1a1d3a 100%)' }}>
-        <Component onComplete={handleLevelComplete} onExit={() => setView('world')} />
-      </div>
-    );
+    // Level zeigt den hellen Sky-Hintergrund. Texte haben Schatten für Kontrast.
+    return <Component onComplete={handleLevelComplete} onExit={() => setView('world')} />;
   }
 
   if (view === 'level-result' && lastResult && activeWorld && activeLevel) {
     const currentIdx = activeWorld.levels.findIndex((l) => l.id === activeLevel.id);
     const nextLevel = lastResult.stars >= 1 && currentIdx >= 0 ? activeWorld.levels[currentIdx + 1] : undefined;
     return (
-      <div className="w-full h-full" style={{ background: 'linear-gradient(180deg, #0a0e27 0%, #1a1d3a 100%)' }}>
-        <LevelResultScreen
-          result={lastResult}
-          onWorld={() => setView('world')}
-          onAgain={() => setView('level')}
-          onNext={
-            nextLevel
-              ? () => {
-                  setActiveLevel(nextLevel);
-                  setView('level');
-                }
-              : undefined
-          }
-        />
-      </div>
+      <LevelResultScreen
+        result={lastResult}
+        onWorld={() => setView('world')}
+        onAgain={() => setView('level')}
+        onNext={
+          nextLevel
+            ? () => {
+                setActiveLevel(nextLevel);
+                setView('level');
+              }
+            : undefined
+        }
+      />
     );
   }
 
@@ -277,20 +270,20 @@ function LevelResultScreen({
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center">
-      <div className="mb-6 animate-pop">
+      <div className="mb-4 animate-pop">
         <PixelIcon name="trophy" size={140} />
       </div>
       <PixelTitle size="lg" color="gold" className="mb-3">
         {result.stars >= 1 ? 'GESCHAFFT!' : "WEITER GEHT'S!"}
       </PixelTitle>
-      <div className="flex gap-3 my-6">
+      <div className="flex gap-3 my-4">
         {[1, 2, 3].map((s) => (
           <div key={s} className={result.stars >= s ? 'animate-pop' : ''} style={{ animationDelay: `${s * 350}ms` }}>
             <PixelIcon name={result.stars >= s ? 'star' : 'star-empty'} size={72} />
           </div>
         ))}
       </div>
-      <div className="bg-amber-200 border-4 border-amber-900 rounded-chunk px-5 py-2 mb-3">
+      <div className="bg-amber-200 border-4 border-amber-900 rounded-chunk px-5 py-2 mb-2">
         <p className="text-xl font-body font-bold text-amber-900">
           {result.correct} von {result.total} richtig
         </p>
@@ -299,20 +292,46 @@ function LevelResultScreen({
         <PixelIcon name="coin" size={28} />
         <span className="font-pixel text-[20px] text-amber-900">+{result.stars * 10 + result.correct * 2}</span>
       </div>
-      <div className="flex flex-wrap gap-3 justify-center">
-        <PixelButton variant="ghost" size="md" onClick={onWorld}>Welt</PixelButton>
-        <PixelButton variant="ghost" size="md" onClick={onAgain}>Nochmal</PixelButton>
-        {onNext && (
-          <PixelButton
-            variant="success"
-            size="lg"
-            onClick={onNext}
-            iconRight={<PixelIcon name="arrow-right" size={22} tone="white" />}
-          >
-            NÄCHSTES LEVEL
-          </PixelButton>
-        )}
+
+      {/* Aktionen: Welt + Nochmal als Icon-Buttons, Weiter als prominenter Pfeil-CTA */}
+      <div className="flex items-end justify-center gap-4">
+        <ResultIconButton icon="globe" label="Welt" onClick={onWorld} />
+        <ResultIconButton icon="repeat" label="Nochmal" onClick={onAgain} />
+        {onNext && <ResultPrimaryButton label="Weiter" onClick={onNext} />}
       </div>
     </div>
+  );
+}
+
+/**
+ * Kleiner Icon-Button (sekundäre Aktion). Großes Icon oben, kleines Label drunter.
+ */
+function ResultIconButton({ icon, label, onClick }: { icon: 'globe' | 'repeat'; label: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="pixel-btn bg-bg-card border-ink shadow-black shadow-pixel-md flex flex-col items-center justify-center gap-1 transition-transform active:scale-95 hover:-translate-y-1"
+      style={{ width: 96, height: 96 }}
+    >
+      <PixelIcon name={icon} size={48} />
+      <span className="font-pixel text-[10px] text-white">{label.toUpperCase()}</span>
+    </button>
+  );
+}
+
+/**
+ * Primärer "Weiter"-Button. Der Pfeil ist das prominente Hauptelement,
+ * der Label-Text dezenter darunter.
+ */
+function ResultPrimaryButton({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="pixel-btn pixel-btn-glossy bg-accent-success border-ink shadow-emerald-900 shadow-pixel-md flex flex-col items-center justify-center gap-1 transition-transform active:scale-95 hover:-translate-y-1"
+      style={{ width: 160, height: 128 }}
+    >
+      <PixelIcon name="arrow-right" size={72} tone="white" />
+      <span className="font-pixel text-[12px] text-white">{label.toUpperCase()}</span>
+    </button>
   );
 }

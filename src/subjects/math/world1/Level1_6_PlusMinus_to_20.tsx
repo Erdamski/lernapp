@@ -107,7 +107,7 @@ export default function Level1_6_PlusMinus_to_20({ onComplete, onExit }: LevelPr
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
         <div className="flex items-center gap-3">
-          <div className="text-3xl sm:text-5xl font-body font-bold text-white/90 text-center">
+          <div className="text-3xl sm:text-5xl font-body font-bold text-white text-center text-outlined">
             {current.a} {current.op === '+' ? '+' : '−'} {current.b} = ?
           </div>
           <IconButton onClick={() => audio.speak(`${current.a} ${current.op === '+' ? 'plus' : 'minus'} ${current.b}`)} aria-label="Frage vorlesen">
