@@ -61,6 +61,11 @@
     box-shadow: 0 0 0 0 var(--tw-shadow-color) !important;
   }
   .pixel-btn:disabled {
+    cursor: default;
+  }
+  /* Klassisch ausgegraute Buttons brauchen explizit dim — Antwort-Buttons sollen
+     sichtbar bleiben und werden mit eigener Farb-Logik markiert. */
+  .pixel-btn[data-dim="true"]:disabled {
     opacity: 0.4;
     box-shadow: 0 2px 0 0 var(--tw-shadow-color);
   }

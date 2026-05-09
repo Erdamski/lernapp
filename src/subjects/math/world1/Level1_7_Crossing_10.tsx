@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { audio } from '@engine/audio/AudioPlayer';
 import { sfx } from '@engine/audio/SoundPlayer';
 import { getRandomEncourageKey, getRandomPraiseKey } from '@engine/audio/manifest';
@@ -9,8 +8,10 @@ import { shuffle } from '@engine/util/shuffle';
 import PixelIcon from '@ui/components/PixelIcon';
 import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
-import AnswerButton from '@ui/components/AnswerButton';
-import { PixelBlock } from '@ui/components/CountBlocks';
+import AnswerButton from "@ui/components/AnswerButton";
+import FeedbackBadge from "@ui/components/FeedbackBadge";
+import MathItems, { pickItemPair } from '@ui/components/MathItems';
+import type { CountItemKind } from '@ui/components/PixelItem';
 import type { LevelProps, LevelResult } from '@subjects/types';
 
 interface CrossTask {
@@ -19,6 +20,8 @@ interface CrossTask {
   op: '+' | '-';
   answer: number;
   options: number[];
+  itemA: CountItemKind;
+  itemB?: CountItemKind;
 }
 
 /**
@@ -27,7 +30,6 @@ interface CrossTask {
  * Visuell mit dem Zwanzigerfeld: Kind sieht "über die 10 hinaus".
  */
 export default function Level1_7_Crossing_10({ onComplete, onExit }: LevelProps) {
-  const { t } = useTranslation();
   const profile = useAppStore((s) => s.activeProfile);
   const [taskIndex, setTaskIndex] = useState(0);
   const correctRef = useRef(0);
@@ -113,8 +115,8 @@ export default function Level1_7_Crossing_10({ onComplete, onExit }: LevelProps)
           </IconButton>
         </div>
 
-        {/* Zwanzigerfeld zeigt das Ergebnis visuell an */}
-        <CrossingField a={current.a} b={current.b} op={current.op} />
+        {/* Echte Pixel-Items statt Blöcke (zwei Gruppen / ausgegraute) */}
+        <MathItems a={current.a} b={current.b} op={current.op} itemA={current.itemA} itemB={current.itemB} />
 
         <div className="flex justify-center gap-5 mt-2">
           {current.options.map((opt) => (
@@ -131,76 +133,14 @@ export default function Level1_7_Crossing_10({ onComplete, onExit }: LevelProps)
         </div>
       </div>
 
-      <div className="font-pixel text-[18px] h-8 mb-2">
-        {feedback === 'correct' && <span className="text-accent-success">{t('task.correct')}</span>}
-        {feedback === 'wrong' && <span className="text-accent-warn">{t('task.wrong')}</span>}
+      <div className="mb-2 flex items-center justify-center min-h-[56px]">
+        <FeedbackBadge feedback={feedback} />
       </div>
 
       {profile && (
         <ProgressRoute totalSteps={tasks.length + 1} currentStep={routeStep} character={profile.character} lastResult={feedback} />
       )}
     </div>
-  );
-}
-
-/**
- * Zwanzigerfeld mit Zehnerübergang sichtbar:
- *  Plus: erste a Blöcke blau, dann b Blöcke grün ergänzt → Übergang über 10 sichtbar
- *  Minus: a Blöcke blau, davon b ausgegraut → Rest sichtbar
- */
-function CrossingField({ a, b, op }: { a: number; b: number; op: '+' | '-' }) {
-  return (
-    <div className="flex flex-col gap-2">
-      {[0, 1].map((row) => (
-        <div key={row} className="flex gap-1.5">
-          {Array.from({ length: 10 }).map((_, col) => {
-            const idx = row * 10 + col;
-            const isFiveBoundary = col === 5;
-            let block: React.ReactNode;
-            if (op === '+') {
-              if (idx < a) block = <PixelBlock color="blue" size={36} />;
-              else if (idx < a + b) block = <PixelBlock color="green" size={36} />;
-              else block = <EmptySlot size={36} />;
-            } else {
-              if (idx < a - b) block = <PixelBlock color="blue" size={36} />;
-              else if (idx < a) block = <FadedBlock size={36} />;
-              else block = <EmptySlot size={36} />;
-            }
-            return (
-              <div key={col} className={isFiveBoundary ? 'ml-2' : ''}>{block}</div>
-            );
-          })}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function EmptySlot({ size }: { size: number }) {
-  return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        border: '3px solid rgba(255,255,255,0.18)',
-        borderRadius: 2,
-      }}
-    />
-  );
-}
-
-function FadedBlock({ size }: { size: number }) {
-  return (
-    <div
-      style={{
-        width: size,
-        height: size,
-        background: '#4b5563',
-        border: '3px solid #1f2937',
-        borderRadius: 2,
-        opacity: 0.5,
-      }}
-    />
   );
 }
 
@@ -237,7 +177,12 @@ function generateTasks(count: number): CrossTask[] {
       const candidate = answer + (Math.random() < 0.5 ? -1 : 1) * (Math.floor(Math.random() * 2) + 1);
       if (candidate !== answer && candidate >= 0 && candidate <= 20) distractors.add(candidate);
     }
-    tasks.push({ a, b, op: isPlus ? '+' : '-', answer, options: shuffle([answer, ...distractors]) });
+    if (isPlus) {
+      const { a: itemA, b: itemB } = pickItemPair();
+      tasks.push({ a, b, op: '+', answer, options: shuffle([answer, ...distractors]), itemA, itemB });
+    } else {
+      tasks.push({ a, b, op: '-', answer, options: shuffle([answer, ...distractors]), itemA: 'apple' });
+    }
   }
   return tasks;
 }

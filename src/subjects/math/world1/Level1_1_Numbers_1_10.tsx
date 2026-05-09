@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { audio } from '@engine/audio/AudioPlayer';
 import { sfx } from '@engine/audio/SoundPlayer';
 import { getRandomEncourageKey, getRandomPraiseKey } from '@engine/audio/manifest';
@@ -9,7 +8,8 @@ import { shuffle } from '@engine/util/shuffle';
 import PixelIcon from '@ui/components/PixelIcon';
 import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
-import AnswerButton from '@ui/components/AnswerButton';
+import AnswerButton from "@ui/components/AnswerButton";
+import FeedbackBadge from "@ui/components/FeedbackBadge";
 import PixelItem, { COUNT_ITEMS_POOL, ITEM_LABELS_DE, type CountItemKind } from '@ui/components/PixelItem';
 import type { LevelProps, LevelResult } from '@subjects/types';
 
@@ -25,7 +25,6 @@ interface CountTask {
  * der Fragetext und die Audio-Ansage matchen genau das gezeigte Item.
  */
 export default function Level1_1({ onComplete, onExit }: LevelProps) {
-  const { t } = useTranslation();
   const profile = useAppStore((s) => s.activeProfile);
   const [taskIndex, setTaskIndex] = useState(0);
   const correctRef = useRef(0);
@@ -135,9 +134,8 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
         </div>
       </div>
 
-      <div className="font-pixel text-[18px] h-8 mb-2">
-        {feedback === 'correct' && <span className="text-accent-success">{t('task.correct')}</span>}
-        {feedback === 'wrong' && <span className="text-accent-warn">{t('task.wrong')}</span>}
+      <div className="mb-2 flex items-center justify-center min-h-[56px]">
+        <FeedbackBadge feedback={feedback} />
       </div>
 
       {profile && (

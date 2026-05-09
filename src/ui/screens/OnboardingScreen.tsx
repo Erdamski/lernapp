@@ -9,7 +9,8 @@ import PixelIcon from '@ui/components/PixelIcon';
 import PixelTitle from '@ui/components/PixelTitle';
 import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
-import AnswerButton from '@ui/components/AnswerButton';
+import AnswerButton from "@ui/components/AnswerButton";
+import FeedbackBadge from "@ui/components/FeedbackBadge";
 import MathItems, { pickItemPair, pickSingleItem } from '@ui/components/MathItems';
 import PixelItem, { COUNT_ITEMS_POOL, ITEM_LABELS_DE, type CountItemKind } from '@ui/components/PixelItem';
 
