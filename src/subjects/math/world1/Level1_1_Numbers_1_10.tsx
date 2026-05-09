@@ -95,14 +95,17 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
           <PixelIcon name="arrow-left" size={26} tone="white" />
         </IconButton>
         <span className="font-pixel text-[16px] text-white/70">{taskIndex + 1} / {tasks.length}</span>
-        <IconButton onClick={() => audio.speak(question)} aria-label="Vorlesen">
-          <PixelIcon name="speaker" size={26} tone="white" />
-        </IconButton>
+        <span className="w-12" /> {/* Spacer für Symmetrie (Speaker ist jetzt bei der Frage) */}
       </header>
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
-        <div className="text-4xl sm:text-5xl font-body font-bold text-white/90 text-center">
-          {question}
+        <div className="flex items-center gap-3 max-w-4xl">
+          <div className="text-3xl sm:text-5xl font-body font-bold text-white/90 text-center">
+            {question}
+          </div>
+          <IconButton onClick={() => audio.speak(question)} aria-label="Frage vorlesen" size={56}>
+            <PixelIcon name="speaker" size={28} tone="white" />
+          </IconButton>
         </div>
 
         <div className="flex flex-row items-center justify-center gap-3 max-w-full">

@@ -97,14 +97,17 @@ export default function Level1_8_Shapes_Money_Time({ onComplete, onExit }: Level
           <PixelIcon name="arrow-left" size={26} tone="white" />
         </IconButton>
         <span className="font-pixel text-[16px] text-white/70">{taskIndex + 1} / {tasks.length}</span>
-        <IconButton onClick={() => audio.speak(current.audioPrompt)}>
-          <PixelIcon name="speaker" size={26} tone="white" />
-        </IconButton>
+        <span className="w-12" />
       </header>
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-8">
-        <div className="text-3xl sm:text-4xl font-body font-bold text-white/90 text-center max-w-3xl">
-          {current.question}
+        <div className="flex items-center gap-3 max-w-4xl">
+          <div className="text-2xl sm:text-4xl font-body font-bold text-white/90 text-center">
+            {current.question}
+          </div>
+          <IconButton onClick={() => audio.speak(current.audioPrompt)} aria-label="Frage vorlesen">
+            <PixelIcon name="speaker" size={26} tone="white" />
+          </IconButton>
         </div>
 
         <div className="animate-pop">{current.visual()}</div>

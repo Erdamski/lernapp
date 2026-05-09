@@ -134,15 +134,17 @@ export default function OnboardingScreen({ onDone }: Props) {
 
   return (
     <div className="w-full h-full flex flex-col items-center p-6">
-      <header className="w-full flex items-center justify-between max-w-4xl mb-2">
+      <header className="w-full flex items-center justify-center max-w-4xl mb-2">
         <span className="font-pixel text-[16px] text-white/70">{taskIndex + 1} / {TASKS.length}</span>
-        <IconButton onClick={() => current && audio.speak(current.question)} aria-label="Vorlesen">
-          <PixelIcon name="speaker" size={26} tone="white" />
-        </IconButton>
       </header>
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
-        <div className="text-4xl sm:text-5xl font-body font-bold text-white/90 text-center">{current?.question}</div>
+        <div className="flex items-center gap-3">
+          <div className="text-3xl sm:text-5xl font-body font-bold text-white/90 text-center">{current?.question}</div>
+          <IconButton onClick={() => current && audio.speak(current.question)} aria-label="Frage vorlesen">
+            <PixelIcon name="speaker" size={26} tone="white" />
+          </IconButton>
+        </div>
         <PromptDisplay prompt={current?.prompt ?? ''} />
 
         <div className="flex justify-center gap-5 mt-4">

@@ -95,14 +95,17 @@ export default function Level1_5_Numbers_to_20({ onComplete, onExit }: LevelProp
           <PixelIcon name="arrow-left" size={26} tone="white" />
         </IconButton>
         <span className="font-pixel text-[16px] text-white/70">{taskIndex + 1} / {tasks.length}</span>
-        <IconButton onClick={() => audio.speak('Wie viele Blöcke siehst du?')}>
-          <PixelIcon name="speaker" size={26} tone="white" />
-        </IconButton>
+        <span className="w-12" />
       </header>
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-8">
-        <div className="text-4xl sm:text-5xl font-body font-bold text-white/90 text-center">
-          Wie viele Blöcke siehst du?
+        <div className="flex items-center gap-3">
+          <div className="text-3xl sm:text-5xl font-body font-bold text-white/90 text-center">
+            Wie viele Blöcke siehst du?
+          </div>
+          <IconButton onClick={() => audio.speak('Wie viele Blöcke siehst du?')} aria-label="Frage vorlesen">
+            <PixelIcon name="speaker" size={26} tone="white" />
+          </IconButton>
         </div>
 
         <TwentyField count={current.answer} />

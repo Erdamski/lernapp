@@ -93,14 +93,17 @@ export default function Level1_4_Minus_10({ onComplete, onExit }: LevelProps) {
           <PixelIcon name="arrow-left" size={26} tone="white" />
         </IconButton>
         <span className="font-pixel text-[16px] text-white/70">{taskIndex + 1} / {tasks.length}</span>
-        <IconButton onClick={() => audio.speak(`${current.a} minus ${current.b}`)}>
-          <PixelIcon name="speaker" size={26} tone="white" />
-        </IconButton>
+        <span className="w-12" />
       </header>
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
-        <div className="text-4xl sm:text-5xl font-body font-bold text-white/90 text-center">
-          {current.a} − {current.b} = ?
+        <div className="flex items-center gap-3">
+          <div className="text-3xl sm:text-5xl font-body font-bold text-white/90 text-center">
+            {current.a} − {current.b} = ?
+          </div>
+          <IconButton onClick={() => audio.speak(`${current.a} minus ${current.b}`)} aria-label="Frage vorlesen">
+            <PixelIcon name="speaker" size={26} tone="white" />
+          </IconButton>
         </div>
 
         <MathBlocks a={current.a} b={current.b} op="-" />
