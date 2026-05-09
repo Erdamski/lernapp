@@ -53,8 +53,8 @@ export default function WorldMapScreen() {
   if (view === 'islands') {
     return (
       <div className="w-full h-full flex flex-col p-4 sm:p-6">
-        {/* Top-Bar: Profil-Switch links, Münz-Anzeige rechts */}
-        <div className="flex items-start justify-between w-full">
+        {/* Top-Bar: Profil-Switch + Münzen links zusammen, rechts ist für den globalen Sound-Toggle reserviert */}
+        <div className="flex items-start justify-start gap-3 w-full">
           <IconButton onClick={logout} aria-label="Profil wechseln">
             <PixelIcon name="swap" size={26} tone="white" />
           </IconButton>

@@ -1,49 +1,66 @@
 import PixelCharacter from './PixelCharacter';
 import PixelIcon from './PixelIcon';
+import TileSprite, { TILE } from './TileSprite';
 import type { CharacterConfig } from '@engine/avatar/character';
 
 interface Props {
   totalSteps: number;
-  currentStep: number;       // 0-basiert; aktuelle Position
+  currentStep: number;
   character: CharacterConfig;
-  /** Optional: zeigt einen "korrekt"-Effekt am letzten erledigten Checkpoint */
   lastResult?: 'correct' | 'wrong' | null;
 }
 
 /**
- * Horizontale Lauf-Strecke: Charakter wandert von links nach rechts,
- * pro beantwortete Aufgabe einen Checkpoint weiter. Am Ende wartet ein Pokal.
- *
- * Visuell: pixelige Grasfläche unten, Checkpoints als Stern-Pfähle,
- * Charakter als animierte PixelCharacter-Komponente.
+ * Lauf-Strecke unten am Spiel-Bildschirm – spannt sich über die volle Breite.
+ * Charakter wandert links → rechts. Pro beantworteter Aufgabe ein Schritt weiter.
+ * Bäume aus Tiny Town schmücken die Strecke (statt im Hintergrund).
  */
 export default function ProgressRoute({ totalSteps, currentStep, character, lastResult }: Props) {
   const segments = Math.max(totalSteps - 1, 1);
   const characterPercent = (currentStep / segments) * 100;
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto h-28 select-none">
-      {/* Himmel/leerer Bereich */}
-      <div className="absolute inset-0" />
+    <div className="relative w-full select-none" style={{ height: 130 }}>
+      {/* Boden – durchgehende Wiese mit Erd-Sockel */}
+      <div className="absolute left-0 right-0 bottom-0" style={{ height: 28, background: '#7c2d12' }} />
+      <div className="absolute left-0 right-0 bottom-7" style={{ height: 18, background: '#16a34a' }} />
+      <div className="absolute left-0 right-0 bottom-[40px]" style={{ height: 4, background: '#22c55e' }} />
 
-      {/* Boden – pixelige Grasfläche */}
-      <div className="absolute left-0 right-0 bottom-0 h-6 bg-amber-800 border-t-4 border-ink" />
-      <div className="absolute left-0 right-0 bottom-6 h-3 bg-emerald-600 border-t-2 border-emerald-800" />
-      <div className="absolute left-0 right-0 bottom-9 h-1 bg-emerald-400 opacity-60" />
+      {/* Bäume und Bushes auf der Strecke */}
+      <div className="absolute" style={{ left: '4%', bottom: 36 }}>
+        <TileSprite index={TILE.TREE_TALL} size={64} />
+      </div>
+      <div className="absolute" style={{ left: '14%', bottom: 36 }}>
+        <TileSprite index={TILE.BUSH} size={40} />
+      </div>
+      <div className="absolute" style={{ left: '34%', bottom: 36 }}>
+        <TileSprite index={TILE.TREE_GREEN} size={56} />
+      </div>
+      <div className="absolute" style={{ left: '52%', bottom: 36 }}>
+        <TileSprite index={TILE.FLOWER_PATCH} size={36} />
+      </div>
+      <div className="absolute" style={{ left: '68%', bottom: 36 }}>
+        <TileSprite index={TILE.TREE_AUTUMN} size={56} />
+      </div>
+      <div className="absolute" style={{ left: '88%', bottom: 36 }}>
+        <TileSprite index={TILE.BUSH} size={40} />
+      </div>
 
       {/* Checkpoints */}
-      <div className="absolute left-2 right-2 bottom-9 flex justify-between items-end">
+      <div className="absolute left-2 right-2 flex justify-between items-end" style={{ bottom: 50 }}>
         {Array.from({ length: totalSteps }).map((_, i) => (
           <Checkpoint key={i} index={i} total={totalSteps} reached={i < currentStep} />
         ))}
       </div>
 
-      {/* Charakter */}
+      {/* Charakter wandert mit smoother Transition */}
       <div
-        className="absolute bottom-8 transition-all duration-700 ease-out"
+        className="absolute transition-all duration-700 ease-out"
         style={{
           left: `calc(${characterPercent}% + 8px)`,
+          bottom: 56,
           transform: 'translateX(-50%)',
+          zIndex: 10,
         }}
       >
         <div className={lastResult === 'correct' ? 'animate-bounce-slow' : ''}>
@@ -51,16 +68,17 @@ export default function ProgressRoute({ totalSteps, currentStep, character, last
         </div>
       </div>
 
-      {/* Status-Effekt */}
+      {/* Status-Effekt am letzten erledigten Knoten */}
       {lastResult === 'correct' && currentStep > 0 && (
         <div
-          className="absolute bottom-20 animate-pop pointer-events-none"
+          className="absolute animate-pop pointer-events-none"
           style={{
             left: `calc(${((currentStep - 1) / segments) * 100}% + 8px)`,
+            bottom: 110,
             transform: 'translateX(-50%)',
           }}
         >
-          <PixelIcon name="check" size={32} />
+          <PixelIcon name="check" size={28} />
         </div>
       )}
     </div>
@@ -69,17 +87,6 @@ export default function ProgressRoute({ totalSteps, currentStep, character, last
 
 function Checkpoint({ index, total, reached }: { index: number; total: number; reached: boolean }) {
   const isFinal = index === total - 1;
-  if (isFinal) {
-    return (
-      <div className="flex flex-col items-center gap-1">
-        <PixelIcon name="trophy" size={36} />
-      </div>
-    );
-  }
-  return (
-    <div className="flex flex-col items-center gap-1">
-      {/* Pfahl */}
-      <PixelIcon name={reached ? 'star' : 'star-empty'} size={20} />
-    </div>
-  );
+  if (isFinal) return <PixelIcon name="trophy" size={32} />;
+  return <PixelIcon name={reached ? 'star' : 'star-empty'} size={20} />;
 }

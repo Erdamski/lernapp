@@ -1,5 +1,4 @@
 import { memo, useMemo } from 'react';
-import TileSprite, { TILE } from './TileSprite';
 
 type Theme = 'world' | 'math' | 'german' | 'celebrate' | 'sky';
 
@@ -17,7 +16,6 @@ interface Props {
  */
 export default memo(function AnimatedBackground({ theme = 'world' }: Props) {
   const items = useMemo(() => generateFloatingChars(theme), [theme]);
-  const grassItems = useMemo(() => generateGrassItems(), []);
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ background: SKY_GRADIENT, zIndex: 0 }}>
@@ -135,30 +133,6 @@ function generateFloatingChars(theme: Theme): FloatingChar[] {
       dir: (['a', 'b', 'c'] as const)[i % 3],
     });
   }
-  return items;
-}
-
-interface GrassItem {
-  x: number;
-  y: number;
-  tile: number;
-  size: number;
-}
-
-function generateGrassItems(): GrassItem[] {
-  // Streue Bäume und Bushes auf der Wiese (deterministisch)
-  const items: GrassItem[] = [
-    { x: 5, y: 4, tile: TILE.TREE_TALL, size: 80 },
-    { x: 14, y: 6, tile: TILE.TREE_GREEN, size: 64 },
-    { x: 22, y: 3, tile: TILE.BUSH, size: 48 },
-    { x: 32, y: 5, tile: TILE.TREE_AUTUMN, size: 72 },
-    { x: 42, y: 4, tile: TILE.FLOWER_PATCH, size: 48 },
-    { x: 55, y: 5, tile: TILE.TREE_TALL, size: 76 },
-    { x: 65, y: 3, tile: TILE.BUSH, size: 48 },
-    { x: 76, y: 6, tile: TILE.TREE_GREEN, size: 64 },
-    { x: 87, y: 4, tile: TILE.FLOWER_PATCH, size: 56 },
-    { x: 95, y: 5, tile: TILE.TREE_SAPLING, size: 56 },
-  ];
   return items;
 }
 
