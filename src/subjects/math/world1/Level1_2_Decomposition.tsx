@@ -11,6 +11,7 @@ import ProgressRoute from '@ui/components/ProgressRoute';
 import AnswerButton from "@ui/components/AnswerButton";
 import FeedbackBadge from "@ui/components/FeedbackBadge";
 import { PixelBlock } from '@ui/components/CountBlocks';
+import { decompositionNodes } from '@engine/audio/speakable';
 import type { LevelProps, LevelResult } from '@subjects/types';
 
 interface DecompTask {
@@ -37,12 +38,13 @@ export default function Level1_2_Decomposition({ onComplete, onExit }: LevelProp
   const tasks = useMemo(() => generateTasks(5), []);
   const current = tasks[taskIndex];
 
+  const voice = current ? decompositionNodes(current.total, current.visible) : null;
+
   useEffect(() => {
-    audio.speak('Welche Zahl fehlt?');
-  }, []);
-  useEffect(() => {
-    if (current) audio.speak(`${current.visible} plus wie viel ist ${current.total}?`);
-  }, [taskIndex, current]);
+    if (!voice) return;
+    const timer = window.setTimeout(() => audio.speak(voice.question), 250);
+    return () => window.clearTimeout(timer);
+  }, [taskIndex, voice]);
 
   const handleAnswer = async (chosen: number) => {
     if (feedback || !current) return;
@@ -111,7 +113,7 @@ export default function Level1_2_Decomposition({ onComplete, onExit }: LevelProp
           <div className="text-3xl sm:text-5xl font-body font-bold text-white text-center text-outlined">
             Welche Zahl fehlt?
           </div>
-          <IconButton onClick={() => audio.speak(`${current.visible} plus wie viel ist ${current.total}?`)} aria-label="Frage vorlesen">
+          <IconButton onClick={() => voice && audio.speak(voice.question)} aria-label="Frage vorlesen">
             <PixelIcon name="speaker" size={26} tone="white" />
           </IconButton>
         </div>

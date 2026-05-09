@@ -11,6 +11,7 @@ import ProgressRoute from '@ui/components/ProgressRoute';
 import AnswerButton from "@ui/components/AnswerButton";
 import FeedbackBadge from "@ui/components/FeedbackBadge";
 import PixelItem, { COUNT_ITEMS_POOL, ITEM_LABELS_DE, type CountItemKind } from '@ui/components/PixelItem';
+import { countNodes } from '@engine/audio/speakable';
 import type { LevelProps, LevelResult } from '@subjects/types';
 
 interface CountTask {
@@ -35,11 +36,16 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
   const tasks = useMemo(() => generateTasks(5), []);
   const current = tasks[taskIndex];
   const labelPl = current ? ITEM_LABELS_DE[current.item].pl : '';
-  const question = `Wie viele ${labelPl} siehst du?`;
+  const visualQuestion = `Wie viele ${labelPl} siehst du?`;
+  const voice = current ? countNodes(current.item, current.answer) : null;
 
+  // Auto-Play der Frage bei jeder neuen Aufgabe (mit kleinem Delay damit
+  // die Animation kurz Platz hat)
   useEffect(() => {
-    if (current) audio.speak(question);
-  }, [taskIndex, current, question]);
+    if (!current || !voice) return;
+    const timer = window.setTimeout(() => audio.speak(voice.question), 250);
+    return () => window.clearTimeout(timer);
+  }, [taskIndex, current, voice]);
 
   const handleAnswer = async (chosen: number) => {
     if (feedback || !current) return;
@@ -98,15 +104,15 @@ export default function Level1_1({ onComplete, onExit }: LevelProps) {
           <PixelIcon name="arrow-left" size={26} tone="white" />
         </IconButton>
         <span className="font-pixel text-[16px] text-white/70">{taskIndex + 1} / {tasks.length}</span>
-        <span className="w-12" /> {/* Spacer für Symmetrie (Speaker ist jetzt bei der Frage) */}
+        <span className="w-12" />
       </header>
 
       <div className="flex-1 w-full flex flex-col items-center justify-center gap-10">
         <div className="flex items-center gap-3 max-w-4xl">
           <div className="text-3xl sm:text-5xl font-body font-bold text-white text-center text-outlined">
-            {question}
+            {visualQuestion}
           </div>
-          <IconButton onClick={() => audio.speak(question)} aria-label="Frage vorlesen" size={56}>
+          <IconButton onClick={() => voice && audio.speak(voice.question)} aria-label="Frage vorlesen" size={56}>
             <PixelIcon name="speaker" size={28} tone="white" />
           </IconButton>
         </div>

@@ -12,6 +12,7 @@ import AnswerButton from "@ui/components/AnswerButton";
 import FeedbackBadge from "@ui/components/FeedbackBadge";
 import MathItems, { pickItemPair } from '@ui/components/MathItems';
 import type { CountItemKind } from '@ui/components/PixelItem';
+import { plusNodes } from '@engine/audio/speakable';
 import type { LevelProps, LevelResult } from '@subjects/types';
 
 interface PlusTask {
@@ -39,13 +40,13 @@ export default function Level1_3_Plus_10({ onComplete, onExit }: LevelProps) {
   const tasks = useMemo(() => generatePlusTasks(5), []);
   const current = tasks[taskIndex];
 
-  useEffect(() => {
-    audio.speak('Wie viel ist plus?');
-  }, []);
+  const voice = current ? plusNodes(current.a, current.b, current.itemA, current.itemB) : null;
 
   useEffect(() => {
-    if (current) audio.speak(`${current.a} plus ${current.b}`);
-  }, [taskIndex, current]);
+    if (!voice) return;
+    const timer = window.setTimeout(() => audio.speak(voice.question), 250);
+    return () => window.clearTimeout(timer);
+  }, [taskIndex, voice]);
 
   const handleAnswer = async (chosen: number) => {
     if (feedback || !current) return;
@@ -112,7 +113,7 @@ export default function Level1_3_Plus_10({ onComplete, onExit }: LevelProps) {
           <div className="text-3xl sm:text-5xl font-body font-bold text-white text-center text-outlined">
             {current.a} + {current.b} = ?
           </div>
-          <IconButton onClick={() => audio.speak(`${current.a} plus ${current.b}`)} aria-label="Frage vorlesen">
+          <IconButton onClick={() => voice && audio.speak(voice.question)} aria-label="Frage vorlesen">
             <PixelIcon name="speaker" size={26} tone="white" />
           </IconButton>
         </div>

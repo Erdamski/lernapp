@@ -12,6 +12,7 @@ import AnswerButton from "@ui/components/AnswerButton";
 import FeedbackBadge from "@ui/components/FeedbackBadge";
 import MathItems, { pickItemPair } from '@ui/components/MathItems';
 import type { CountItemKind } from '@ui/components/PixelItem';
+import { plusNodes, minusNodes } from '@engine/audio/speakable';
 import type { LevelProps, LevelResult } from '@subjects/types';
 
 interface CrossTask {
@@ -41,9 +42,17 @@ export default function Level1_7_Crossing_10({ onComplete, onExit }: LevelProps)
   const tasks = useMemo(() => generateTasks(5), []);
   const current = tasks[taskIndex];
 
+  const voice = current
+    ? current.op === '+'
+      ? plusNodes(current.a, current.b, current.itemA, current.itemB ?? current.itemA)
+      : minusNodes(current.a, current.b, current.itemA)
+    : null;
+
   useEffect(() => {
-    if (current) audio.speak(`${current.a} ${current.op === '+' ? 'plus' : 'minus'} ${current.b}`);
-  }, [taskIndex, current]);
+    if (!voice) return;
+    const timer = window.setTimeout(() => audio.speak(voice.question), 250);
+    return () => window.clearTimeout(timer);
+  }, [taskIndex, voice]);
 
   const handleAnswer = async (chosen: number) => {
     if (feedback || !current) return;
@@ -110,7 +119,7 @@ export default function Level1_7_Crossing_10({ onComplete, onExit }: LevelProps)
           <div className="text-3xl sm:text-5xl font-body font-bold text-white text-center text-outlined">
             {current.a} {current.op === '+' ? '+' : '−'} {current.b} = ?
           </div>
-          <IconButton onClick={() => audio.speak(`${current.a} ${current.op === '+' ? 'plus' : 'minus'} ${current.b}`)} aria-label="Frage vorlesen">
+          <IconButton onClick={() => voice && audio.speak(voice.question)} aria-label="Frage vorlesen">
             <PixelIcon name="speaker" size={26} tone="white" />
           </IconButton>
         </div>
