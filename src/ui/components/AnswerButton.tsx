@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, CSSProperties } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -9,29 +9,47 @@ interface Props {
 }
 
 /**
- * Antwort-Button mit klarem Farb-Feedback und ohne irritierendes Ausblenden:
- *  - Klick auf RICHTIGE Antwort → grün
- *  - Klick auf FALSCHE Antwort → rot, danach wird die richtige Antwort grün hervorgehoben
- *  - Sonst neutral blau
- *  - Andere Buttons während der Feedback-Phase bleiben voll sichtbar (nur klick-blockiert)
+ * Antwort-Button mit klarem Farb-Feedback.
+ * Inline-Styles statt Tailwind-Color-Klassen, damit die Farben garantiert
+ * applied werden (kein JIT-Caching-Glück).
+ *
+ * - Klick auf RICHTIGE Antwort  → grüner Bg + dunkelgrüner Rahmen
+ * - Klick auf FALSCHE Antwort   → roter Bg + dunkelroter Rahmen
+ * - Reveal richtige bei falsch  → grüner Bg + dunkelgrüner Rahmen
+ * - Sonst neutral blau
  */
 export default function AnswerButton({ children, picked, isAnswer, feedback, onClick }: Props) {
-  let bg = 'bg-primary-500 active:bg-primary-600 shadow-ink-soft';
-  if (feedback === 'correct' && picked) {
-    bg = 'bg-accent-success shadow-emerald-900';
-  } else if (feedback === 'wrong' && picked) {
-    bg = 'bg-accent-danger shadow-red-900';
-  } else if (feedback === 'wrong' && isAnswer) {
-    bg = 'bg-accent-success shadow-emerald-900';
-  }
+  const state = pickState(picked, isAnswer, feedback);
+  const PALETTE = {
+    correct: { bg: '#10b981', border: '#047857', shadow: '#065f46' },
+    wrong:   { bg: '#ef4444', border: '#b91c1c', shadow: '#7f1d1d' },
+    neutral: { bg: '#6366f1', border: '#312e81', shadow: '#1e1b4b' },
+  } as const;
+  const c = PALETTE[state];
+  const style: CSSProperties = {
+    background: c.bg,
+    borderColor: c.border,
+    borderStyle: 'solid',
+    borderWidth: 4,
+    boxShadow: `0 7px 0 0 ${c.shadow}`,
+    color: 'white',
+  };
 
   return (
     <button
       onClick={onClick}
       disabled={feedback !== null}
-      className={`pixel-btn border-ink rounded-chunk shadow-pixel-lg w-32 h-32 sm:w-36 sm:h-36 text-[44px] sm:text-[52px] font-pixel text-white transition-colors ${bg}`}
+      style={style}
+      className="rounded-chunk w-32 h-32 sm:w-36 sm:h-36 text-[44px] sm:text-[52px] font-pixel transition-colors active:translate-y-1"
     >
       {children}
     </button>
   );
+}
+
+function pickState(picked: boolean, isAnswer: boolean, feedback: 'correct' | 'wrong' | null): 'correct' | 'wrong' | 'neutral' {
+  if (feedback === 'correct' && picked) return 'correct';
+  if (feedback === 'wrong' && picked) return 'wrong';
+  if (feedback === 'wrong' && isAnswer) return 'correct'; // reveal richtige
+  return 'neutral';
 }

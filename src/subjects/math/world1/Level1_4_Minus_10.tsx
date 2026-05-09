@@ -9,7 +9,6 @@ import PixelIcon from '@ui/components/PixelIcon';
 import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
 import AnswerButton from "@ui/components/AnswerButton";
-import FeedbackBadge from "@ui/components/FeedbackBadge";
 import MathItems, { pickSingleItem } from '@ui/components/MathItems';
 import type { CountItemKind } from '@ui/components/PixelItem';
 import type { LevelProps } from '@subjects/types';
@@ -127,11 +126,6 @@ export default function Level1_4_Minus_10({ onComplete, onExit }: LevelProps) {
           ))}
         </div>
       </div>
-
-      <div className="mb-2 flex items-center justify-center min-h-[56px]">
-        <FeedbackBadge feedback={feedback} />
-      </div>
-
       {profile && (
         <ProgressRoute totalSteps={tasks.length + 1} currentStep={routeStep} character={profile.character} lastResult={feedback} />
       )}
