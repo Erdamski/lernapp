@@ -107,8 +107,11 @@ export default memo(function WorldRoadmap({ levels, progress, character, onLevel
   const mapH = WORLD_H * tileSize;
 
   return (
-    <div className="relative w-full overflow-x-auto rounded-chunk border-4 border-ink shadow-pixel-md shadow-ink">
-      <div className="relative" style={{ width: mapW, height: mapH }}>
+    <div className="w-full flex justify-center overflow-x-auto">
+      <div
+        className="relative rounded-chunk border-4 border-ink shadow-pixel-md shadow-ink overflow-hidden"
+        style={{ width: mapW, height: mapH, flexShrink: 0 }}
+      >
         {/* Hintergrund: alle Terrain-Tiles */}
         {terrain.map((row, y) =>
           row.map((tile, x) => (
