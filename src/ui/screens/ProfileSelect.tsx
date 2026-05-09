@@ -102,7 +102,6 @@ export default function ProfileSelect({ onParentZone }: Props) {
 const CARD_W = 180;
 const CARD_BOX_H = 200;
 const CARD_LABEL_H = 64;
-const CARD_TOTAL_H = CARD_BOX_H + 12 + CARD_LABEL_H; // = 276
 
 function CardLabel({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
