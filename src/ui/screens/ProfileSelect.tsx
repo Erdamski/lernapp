@@ -99,9 +99,22 @@ export default function ProfileSelect({ onParentZone }: Props) {
 
 // ─── Karten mit fixer Höhe, damit alle gleich aussehen ─────────────────────────
 
-const CARD_W = 160;
-const CARD_INNER_H = 160;
-const CARD_TOTAL_H = 260;
+const CARD_W = 180;
+const CARD_BOX_H = 200;
+const CARD_LABEL_H = 64;
+const CARD_TOTAL_H = CARD_BOX_H + 12 + CARD_LABEL_H; // = 276
+
+function CardLabel({ title, subtitle }: { title: string; subtitle?: string }) {
+  return (
+    <div
+      className="bg-amber-200 border-4 border-amber-900 rounded-chunk px-4 shadow-pixel-sm shadow-amber-900 flex flex-col items-center justify-center text-center"
+      style={{ height: CARD_LABEL_H, minWidth: 140 }}
+    >
+      <div className="text-xl font-display font-bold text-amber-900 leading-tight">{title}</div>
+      {subtitle && <div className="text-xs font-body text-amber-800">{subtitle}</div>}
+    </div>
+  );
+}
 
 function ProfileCard({ name, age, languageLabel, avatar, onClick }: {
   name: string;
@@ -113,28 +126,27 @@ function ProfileCard({ name, age, languageLabel, avatar, onClick }: {
   return (
     <button
       onClick={onClick}
-      className="relative flex flex-col items-center gap-2 transition-transform active:scale-95 hover:-translate-y-1"
-      style={{ width: CARD_W, height: CARD_TOTAL_H }}
+      className="flex flex-col items-center gap-3 transition-transform active:scale-95 hover:-translate-y-1"
+      style={{ width: CARD_W }}
     >
-      {/* Pixel-Haus */}
-      <div className="relative" style={{ width: CARD_W, height: CARD_INNER_H }}>
-        <div className="grid grid-cols-2" style={{ width: CARD_W }}>
-          <TileSprite index={38} size={CARD_W / 2} />
-          <TileSprite index={39} size={CARD_W / 2} />
-          <TileSprite index={TILE.HOUSE_WALL_LEFT} size={CARD_W / 2} />
-          <TileSprite index={TILE.HOUSE_WALL_RIGHT} size={CARD_W / 2} />
+      {/* Pixel-Haus + Avatar – fixe Box-Höhe */}
+      <div
+        className="relative rounded-chunk overflow-hidden border-4 border-amber-900 shadow-pixel-md shadow-amber-900"
+        style={{ width: CARD_BOX_H, height: CARD_BOX_H, background: 'linear-gradient(180deg, #fef3c7, #fde68a)' }}
+      >
+        {/* Haus klein im Hintergrund */}
+        <div className="absolute left-1/2 -translate-x-1/2 grid grid-cols-2" style={{ top: 8, width: CARD_BOX_H * 0.6 }}>
+          <TileSprite index={38} size={CARD_BOX_H * 0.3} />
+          <TileSprite index={39} size={CARD_BOX_H * 0.3} />
+          <TileSprite index={TILE.HOUSE_WALL_LEFT} size={CARD_BOX_H * 0.3} />
+          <TileSprite index={TILE.HOUSE_WALL_RIGHT} size={CARD_BOX_H * 0.3} />
         </div>
-        {/* Avatar steht vor dem Haus */}
-        <div className="absolute left-1/2 -translate-x-1/2 -bottom-2">
-          <AvatarSprite config={avatar} size={120} />
+        {/* Avatar im Vordergrund unten zentriert */}
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-2">
+          <AvatarSprite config={avatar} size={CARD_BOX_H * 0.7} />
         </div>
       </div>
-
-      {/* Name auf Holz-Schild – fixe Position für Konsistenz */}
-      <div className="mt-12 bg-amber-200 border-4 border-amber-900 rounded-chunk px-4 py-1 shadow-pixel-sm shadow-amber-900 min-w-[140px] text-center">
-        <div className="text-xl font-display font-bold text-amber-900 leading-tight">{name}</div>
-        <div className="text-xs font-body text-amber-800">{age} J · {languageLabel}</div>
-      </div>
+      <CardLabel title={name} subtitle={`${age} J · ${languageLabel}`} />
     </button>
   );
 }
@@ -143,26 +155,22 @@ function NewProfileCard({ onClick, label }: { onClick: () => void; label: string
   return (
     <button
       onClick={onClick}
-      className="relative flex flex-col items-center gap-2 transition-transform active:scale-95 hover:-translate-y-1"
-      style={{ width: CARD_W, height: CARD_TOTAL_H }}
+      className="flex flex-col items-center gap-3 transition-transform active:scale-95 hover:-translate-y-1"
+      style={{ width: CARD_W }}
     >
-      {/* Plus-Kachel mit gleicher Höhe wie ProfileCard-Haus + Avatar-Bereich */}
       <div
         className="rounded-chunk border-4 border-dashed flex items-center justify-center"
         style={{
-          width: CARD_W,
-          height: CARD_INNER_H + 60, // entspricht Haus + Avatar-Überlappung
+          width: CARD_BOX_H,
+          height: CARD_BOX_H,
           background: 'rgba(255,255,255,0.4)',
           borderColor: '#ca8a04',
           boxShadow: '0 6px 0 0 #92400e',
         }}
       >
-        <PixelIcon name="plus" size={72} tone="ink" />
+        <PixelIcon name="plus" size={88} tone="ink" />
       </div>
-      <div className="mt-1 bg-amber-200 border-4 border-amber-900 rounded-chunk px-4 py-1 shadow-pixel-sm shadow-amber-900 min-w-[140px] text-center">
-        <div className="text-xl font-display font-bold text-amber-900 leading-tight">{label}</div>
-        <div className="text-xs font-body text-amber-800">&nbsp;</div>
-      </div>
+      <CardLabel title={label} />
     </button>
   );
 }
