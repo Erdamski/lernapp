@@ -63,7 +63,7 @@ export default function App() {
         <WelcomeOverlay profile={activeProfile} onDone={handleWelcomeDone} />
       )}
       {screen === 'onboarding' && (
-        <div className="w-full h-full bg-gradient-to-b from-bg-deep to-bg-mid">
+        <div className="w-full h-full" style={{ background: 'linear-gradient(180deg, #0a0e27 0%, #1a1d3a 100%)' }}>
           <OnboardingScreen onDone={() => setScreen('world-map')} />
         </div>
       )}
@@ -72,7 +72,7 @@ export default function App() {
         <ParentGate onSuccess={() => setScreen('parent-dashboard')} onCancel={() => setScreen('profile-select')} />
       )}
       {screen === 'parent-dashboard' && (
-        <div className="w-full h-full bg-gradient-to-b from-bg-deep to-bg-mid">
+        <div className="w-full h-full" style={{ background: 'linear-gradient(180deg, #0a0e27 0%, #1a1d3a 100%)' }}>
           <ParentDashboard onExit={() => setScreen('profile-select')} />
         </div>
       )}

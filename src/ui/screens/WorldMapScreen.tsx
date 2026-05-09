@@ -136,7 +136,7 @@ export default function WorldMapScreen() {
     // Level läuft auf dunklem Spiel-Hintergrund, damit die hellen Sky-Farben
     // nicht von Frage-/Antwort-Texten ablenken.
     return (
-      <div className="w-full h-full bg-gradient-to-b from-bg-deep to-bg-mid">
+      <div className="w-full h-full" style={{ background: 'linear-gradient(180deg, #0a0e27 0%, #1a1d3a 100%)' }}>
         <Component onComplete={handleLevelComplete} onExit={() => setView('world')} />
       </div>
     );
@@ -146,7 +146,7 @@ export default function WorldMapScreen() {
     const currentIdx = activeWorld.levels.findIndex((l) => l.id === activeLevel.id);
     const nextLevel = lastResult.stars >= 1 && currentIdx >= 0 ? activeWorld.levels[currentIdx + 1] : undefined;
     return (
-      <div className="w-full h-full bg-gradient-to-b from-bg-deep to-bg-mid">
+      <div className="w-full h-full" style={{ background: 'linear-gradient(180deg, #0a0e27 0%, #1a1d3a 100%)' }}>
         <LevelResultScreen
           result={lastResult}
           onWorld={() => setView('world')}

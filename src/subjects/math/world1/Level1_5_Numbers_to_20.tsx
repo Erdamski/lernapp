@@ -9,6 +9,7 @@ import { shuffle } from '@engine/util/shuffle';
 import PixelIcon from '@ui/components/PixelIcon';
 import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
+import AnswerButton from '@ui/components/AnswerButton';
 import { PixelBlock } from '@ui/components/CountBlocks';
 import type { LevelProps } from '@subjects/types';
 
@@ -29,6 +30,7 @@ export default function Level1_5_Numbers_to_20({ onComplete, onExit }: LevelProp
   const [taskIndex, setTaskIndex] = useState(0);
   const correctRef = useRef(0);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
+  const [picked, setPicked] = useState<number | null>(null);
   const startedAt = useMemo(() => Date.now(), []);
   const attempts = useRef<{ taskKey: string; correct: boolean }[]>([]);
   const tasks = useMemo(() => generateTasks(5), []);
@@ -43,6 +45,7 @@ export default function Level1_5_Numbers_to_20({ onComplete, onExit }: LevelProp
 
   const handleAnswer = async (chosen: number) => {
     if (feedback || !current) return;
+    setPicked(chosen);
     const isCorrect = chosen === current.answer;
     const taskKey = `math:count20:${current.answer}`;
     attempts.current.push({ taskKey, correct: isCorrect });
@@ -61,9 +64,10 @@ export default function Level1_5_Numbers_to_20({ onComplete, onExit }: LevelProp
 
     setTimeout(() => {
       setFeedback(null);
+      setPicked(null);
       if (taskIndex + 1 >= tasks.length) finalize();
       else setTaskIndex((i) => i + 1);
-    }, 800);
+    }, 1100);
   };
 
   const finalize = () => {
@@ -111,23 +115,17 @@ export default function Level1_5_Numbers_to_20({ onComplete, onExit }: LevelProp
         <TwentyField count={current.answer} />
 
         <div className="flex justify-center gap-5 mt-2">
-          {current.options.map((opt) => {
-            const isCorrect = feedback === 'correct' && opt === current.answer;
-            const reveal = feedback === 'wrong' && opt === current.answer;
-            return (
-              <button
-                key={opt}
-                onClick={() => handleAnswer(opt)}
-                disabled={feedback !== null}
-                className={`pixel-btn border-ink rounded-chunk shadow-pixel-lg w-32 h-32 sm:w-36 sm:h-36 text-[44px] sm:text-[52px] font-pixel text-white transition-colors
-                  ${isCorrect || reveal
-                    ? 'bg-accent-success shadow-emerald-900'
-                    : 'bg-primary-500 active:bg-primary-600 shadow-ink-soft'}`}
-              >
-                {opt}
-              </button>
-            );
-          })}
+          {current.options.map((opt) => (
+            <AnswerButton
+              key={opt}
+              picked={picked === opt}
+              isAnswer={opt === current.answer}
+              feedback={feedback}
+              onClick={() => handleAnswer(opt)}
+            >
+              {opt}
+            </AnswerButton>
+          ))}
         </div>
       </div>
 

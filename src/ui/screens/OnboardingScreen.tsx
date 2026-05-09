@@ -9,6 +9,7 @@ import PixelIcon from '@ui/components/PixelIcon';
 import PixelTitle from '@ui/components/PixelTitle';
 import IconButton from '@ui/components/IconButton';
 import ProgressRoute from '@ui/components/ProgressRoute';
+import AnswerButton from '@ui/components/AnswerButton';
 import { MathBlocks } from '@ui/components/CountBlocks';
 import PixelItem, { COUNT_ITEMS_POOL, ITEM_LABELS_DE, type CountItemKind } from '@ui/components/PixelItem';
 
@@ -61,6 +62,7 @@ export default function OnboardingScreen({ onDone }: Props) {
   const [taskIndex, setTaskIndex] = useState(0);
   const [highestPassed, setHighestPassed] = useState<0 | 1 | 2 | 3 | 4 | 5>(0);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
+  const [picked, setPicked] = useState<number | null>(null);
 
   useEffect(() => {
     if (stage === 'intro') audio.play('onboarding/dragon_intro', { fallbackToTTS: true });
@@ -75,6 +77,7 @@ export default function OnboardingScreen({ onDone }: Props) {
 
   const handleAnswer = async (chosen: number) => {
     if (feedback || !current) return;
+    setPicked(chosen);
     const correct = chosen === current.answer;
     setFeedback(correct ? 'correct' : 'wrong');
 
@@ -85,12 +88,13 @@ export default function OnboardingScreen({ onDone }: Props) {
 
     setTimeout(() => {
       setFeedback(null);
+      setPicked(null);
       if (taskIndex + 1 >= TASKS.length || (!correct && taskIndex >= 2)) {
         finalize();
       } else {
         setTaskIndex((i) => i + 1);
       }
-    }, 700);
+    }, 1100);
   };
 
   const finalize = async () => {
@@ -148,22 +152,17 @@ export default function OnboardingScreen({ onDone }: Props) {
         <PromptDisplay prompt={current?.prompt ?? ''} />
 
         <div className="flex justify-center gap-5 mt-4">
-          {current?.options.map((opt) => {
-            const showAsCorrect = feedback && opt === current.answer;
-            return (
-              <button
-                key={opt}
-                onClick={() => handleAnswer(opt)}
-                disabled={feedback !== null}
-                className={`pixel-btn border-ink rounded-chunk shadow-pixel-lg w-32 h-32 sm:w-36 sm:h-36 text-[44px] sm:text-[52px] font-pixel text-white transition-colors
-                  ${showAsCorrect
-                    ? 'bg-accent-success shadow-emerald-900'
-                    : 'bg-primary-500 active:bg-primary-600 shadow-ink-soft'}`}
-              >
-                {opt}
-              </button>
-            );
-          })}
+          {current?.options.map((opt) => (
+            <AnswerButton
+              key={opt}
+              picked={picked === opt}
+              isAnswer={opt === current.answer}
+              feedback={feedback}
+              onClick={() => handleAnswer(opt)}
+            >
+              {opt}
+            </AnswerButton>
+          ))}
         </div>
       </div>
 
