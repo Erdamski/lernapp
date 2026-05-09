@@ -13,7 +13,6 @@ import PixelIcon from '@ui/components/PixelIcon';
 import PixelTitle from '@ui/components/PixelTitle';
 import IconButton from '@ui/components/IconButton';
 import WorldRoadmap from '@ui/components/WorldRoadmap';
-import TileSprite from '@ui/components/TileSprite';
 import type { ProgressEntry } from '@engine/db/schema';
 
 type View = 'islands' | 'world' | 'level' | 'shop' | 'level-result';
@@ -53,49 +52,45 @@ export default function WorldMapScreen() {
 
   if (view === 'islands') {
     return (
-      <div className="w-full h-full flex flex-col p-6">
-        <header className="flex items-center justify-between max-w-6xl mx-auto w-full mb-6">
+      <div className="w-full h-full flex flex-col p-4 sm:p-6">
+        {/* Top-Bar: Profil-Switch links, Münz-Anzeige rechts */}
+        <div className="flex items-start justify-between w-full">
           <IconButton onClick={logout} aria-label="Profil wechseln">
             <PixelIcon name="swap" size={26} tone="white" />
           </IconButton>
+          <div className="pixel-btn bg-accent-coin border-0 shadow-amber-700 shadow-pixel-sm px-4 h-12 flex items-center gap-2 cursor-default">
+            <PixelIcon name="coin" size={22} />
+            <span className="font-pixel text-[14px] text-ink">{profile.coins}</span>
+          </div>
+        </div>
+
+        {/* Zentraler Block: Headline + Inseln + Ankleiden – alles dicht beieinander */}
+        <div className="flex-1 flex flex-col items-center justify-center gap-6">
           <div className="bg-amber-700 border-4 border-ink rounded-chunk px-6 py-2 shadow-pixel-md shadow-amber-900">
             <PixelTitle size="lg" color="white">{t('world.map_title')}</PixelTitle>
           </div>
-          <button
-            onClick={() => setView('shop')}
-            className="pixel-btn pixel-btn-glossy bg-accent-coin border-ink shadow-amber-700 shadow-pixel-md px-4 h-14 flex items-center gap-2"
-          >
-            <PixelIcon name="coin" size={24} />
-            <span className="font-pixel text-[14px] text-ink">{profile.coins}</span>
-          </button>
-        </header>
 
-        <div className="flex-1 flex items-center justify-center gap-6 flex-wrap py-6">
-          {SUBJECTS.map((s) => (
-            <SubjectIsland
-              key={s.id}
-              id={s.id}
-              labelKey={s.labelKey}
-              onClick={() => {
-                setActiveSubjectId(s.id);
-                setActiveWorld(s.worlds[0]);
-                setView('world');
-              }}
-            />
-          ))}
-          <SubjectIsland id="locked-german" labelKey="subjects.german" disabled />
-          <SubjectIsland id="locked-english" labelKey="subjects.english" disabled />
-        </div>
-
-        <footer className="flex justify-center gap-4 mt-2">
-          <div className="pixel-btn bg-amber-200 border-ink shadow-amber-900 shadow-pixel-sm h-12 px-4 flex items-center gap-2 cursor-default">
-            <PixelIcon name="star" size={22} />
-            <span className="font-pixel text-[14px] text-amber-900">{profile.totalStars}</span>
+          <div className="flex items-start justify-center gap-6 flex-wrap">
+            {SUBJECTS.map((s) => (
+              <SubjectIsland
+                key={s.id}
+                id={s.id}
+                labelKey={s.labelKey}
+                onClick={() => {
+                  setActiveSubjectId(s.id);
+                  setActiveWorld(s.worlds[0]);
+                  setView('world');
+                }}
+              />
+            ))}
+            <SubjectIsland id="locked-german" labelKey="subjects.german" disabled />
+            <SubjectIsland id="locked-english" labelKey="subjects.english" disabled />
           </div>
+
           <PixelButton variant="ghost" size="md" onClick={() => setView('shop')} iconLeft={<PixelIcon name="shirt" size={22} />}>
             Ankleiden
           </PixelButton>
-        </footer>
+        </div>
       </div>
     );
   }
@@ -189,7 +184,11 @@ export default function WorldMapScreen() {
 
 /**
  * Subject als großes Insel-Schild mit Pixel-Icon. Kindgerecht & lese-arm.
+ * Einheitliche Höhe für alle Karten (auch wenn locked) – wirkt wie eine Galerie.
  */
+const ISLAND_BOX = 200;
+const ISLAND_LABEL_H = 48;
+
 function SubjectIsland({ id, labelKey, onClick, disabled }: { id: string; labelKey: string; onClick?: () => void; disabled?: boolean }) {
   const { t } = useTranslation();
   const isMath = id === 'math';
@@ -197,16 +196,16 @@ function SubjectIsland({ id, labelKey, onClick, disabled }: { id: string; labelK
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`relative flex flex-col items-center gap-3 p-2 transition-transform ${
-        disabled ? 'opacity-50' : 'active:scale-95 hover:-translate-y-1'
+      className={`flex flex-col items-center transition-transform ${
+        disabled ? 'opacity-60' : 'active:scale-95 hover:-translate-y-1'
       }`}
+      style={{ width: ISLAND_BOX }}
     >
-      {/* Schild-Hintergrund */}
       <div
-        className="rounded-chunk border-4 border-ink shadow-pixel-md shadow-ink p-6 flex items-center justify-center"
+        className="rounded-chunk border-4 border-ink shadow-pixel-md shadow-ink flex items-center justify-center"
         style={{
-          width: 200,
-          height: 200,
+          width: ISLAND_BOX,
+          height: ISLAND_BOX,
           background: disabled
             ? 'linear-gradient(180deg, #94a3b8, #475569)'
             : isMath
@@ -223,15 +222,14 @@ function SubjectIsland({ id, labelKey, onClick, disabled }: { id: string; labelK
         )}
       </div>
 
-      {/* Holz-Schild mit Label */}
-      <div className="bg-amber-700 border-4 border-ink rounded-chunk px-5 py-2 shadow-pixel-md shadow-amber-900 mt-2">
-        <span className="font-pixel text-[16px] text-white">{t(labelKey).toUpperCase()}</span>
-      </div>
-
-      {/* Stützpfosten unter dem Schild für Pole-Look */}
-      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex gap-8">
-        <TileSprite index={31} size={20} />
-        <TileSprite index={31} size={20} />
+      {/* Holz-Schild – fixe Höhe → alle Cards uniform */}
+      <div
+        className="bg-amber-700 border-4 border-ink rounded-chunk px-5 mt-3 shadow-pixel-md shadow-amber-900 flex items-center justify-center"
+        style={{ height: ISLAND_LABEL_H, minWidth: 140 }}
+      >
+        <span className={`font-pixel text-[14px] ${disabled ? 'text-amber-200/70' : 'text-white'}`}>
+          {t(labelKey).toUpperCase()}
+        </span>
       </div>
     </button>
   );
